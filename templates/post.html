@@ -1,0 +1,18 @@
+
+<div class="post">
+  <div class="post-heading">
+    <div> <a class="post-note" href = "/wiki/_edit/{{p.subject}}">edit</a></div>
+    <div class="post-title">
+      {{p.subject}}
+    </div>
+
+    <div  class="post-date">
+      
+      {{p.created.strftime("%c")}}
+    </div>
+  </div>
+  
+  <div class="post-content">
+    {{p._render_text }} 
+  </div>
+</div>
