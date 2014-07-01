@@ -23,10 +23,14 @@ class MovieListing(db.Model):
     ReleaseDate = db.DateTimeProperty(required = False)
     Created = db.DateTimeProperty(auto_now_add = True)
     Last_modified = db.DateTimeProperty(auto_now = True)
+    
+
 
     def render(self):
         return render_str("Movie_listing.html", listing = self)
-    
+
+
+   
 def single_listing( listing_id):
     db_key = db.Key.from_path('MovieListing', int(listing_id) )
     return db.get(db_key)    

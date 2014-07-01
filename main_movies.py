@@ -19,7 +19,7 @@ import re
 import time
 from google.appengine.ext import db
 
-Post = models.Post
+MovieListing = models.MovieListing
 Users = models.Users
 signup = models.Users.signup
 login_check = models.Users.login_check
@@ -27,7 +27,7 @@ correct_cookie = models.Users.correct_cookie
 make_json_str = utilities_mu.make_json_str
 Post_as_dict = utilities_mu.Post_as_dict
 render_str = jinja_util.render_str
-single_post = models.single_post
+#single_post = models.single_post
 
 class MovieHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
@@ -88,8 +88,15 @@ class AddMovie(MovieHandler):
         #    IMDB_link = str(IMDB_link)
         IMDB_link = str(IMDB_link)    
         self.render("AddMovie.html", IMDB_link = IMDB_link)
+        
     def post(self, IMDB_link):
-        IMDB_entered = self.request.get("IMDB_link")
+        IMDB_entered = str(self.request.get("IMDB_link"))
+        #do validation according to API, save details in DB
+        #make sure URL is good-otherwise db crash
+        
+        #temp code to test.
+        q = MovieListing(Title = "Testing", IMDB_link = IMDB_entered, Followed = 1)
+        q.put()
         #do validation according to API, save details in DB
         
 class RemoveMovie(MovieHandler):
