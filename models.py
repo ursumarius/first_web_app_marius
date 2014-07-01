@@ -5,6 +5,7 @@ import utilities_mu
 import jinja_util
 from collections import namedtuple
 from google.appengine.ext import db
+import logging
 
 render_str = jinja_util.render_str
 valid_pw = utilities_mu.valid_pw
@@ -24,6 +25,18 @@ class MovieListing(db.Model):
     Created = db.DateTimeProperty(auto_now_add = True)
     Last_modified = db.DateTimeProperty(auto_now = True)
     
+    @classmethod
+    def FollowedChange(cls, movie_id, truth):
+        db_key = db.Key.from_path('MovieListing', movie_id)
+        q = db.get(db_key)
+        if q and (truth == 1 or truth == 0 ):
+            
+            q.Followed = int(truth)
+            q.put()
+            #logging.error("Followed in db = %s"%str(q.Followed))
+            return True
+        else:
+            return False
 
 
     def render(self):

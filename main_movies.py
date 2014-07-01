@@ -19,6 +19,7 @@ import re
 import time
 from google.appengine.ext import db
 
+FollowedChange = models.MovieListing.FollowedChange
 MovieListing = models.MovieListing
 Users = models.Users
 signup = models.Users.signup
@@ -84,6 +85,7 @@ class MoviePage(MovieHandler):
 class AddMovie(MovieHandler):
     def get(self, IMDB_link):
         #check if valid immediately as in post
+        #check if already exists
         #if IMDB_link:
         #    IMDB_link = str(IMDB_link)
         IMDB_link = str(IMDB_link)    
@@ -97,12 +99,16 @@ class AddMovie(MovieHandler):
         #temp code to test.
         q = MovieListing(Title = "Testing", IMDB_link = IMDB_entered, Followed = 1)
         q.put()
+        #self.write(q.key().id())
         #do validation according to API, save details in DB
         
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
-       
-        self.write("RemoveMovie")
+        if (FollowedChange(int(movie_id), 0)):
+            logging.error("Changed")
+        else:
+            logging.error("Couldnt change")
+        #self.write("RemoveMovie")
         
     #def post(self, path_ext):
     #    login = self.request.cookies.get("login", "error no cookie")
