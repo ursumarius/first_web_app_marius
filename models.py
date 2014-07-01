@@ -19,7 +19,7 @@ class MovieListing(db.Model):
     Actors = db.StringProperty(required = False)
     
     FoundTorrent = db.IntegerProperty(required = False)
-    TorrentLinks = db.StringProperty(required = False)
+    TorrentLink1 = db.StringProperty(required = False)
     
     ReleaseDate = db.DateTimeProperty(required = False)
     Created = db.DateTimeProperty(auto_now_add = True)
@@ -53,12 +53,12 @@ class MovieListing(db.Model):
         
     @classmethod
     def NewListing(cls, Title, IMDB_link, Followed = 1, Creators = "", Actors = "",
-                   FoundTorrent = 0, TorrentLinks = "", ReleaseDate = ""):
+                   FoundTorrent = 0, TorrentLink1 = "", ReleaseDate = ""):
         #assume all data is valid (e.g. link is link) -- how to handler errors while entering in DB?
         try:
             q = MovieListing(Title = str(Title), IMDB_link = str(IMDB_link), Followed = int(Followed),
                          Creators = str(Creators), Actors = str(Actors), FoundTorrent = int(FoundTorrent),
-                         TorrentLinks = str(TorrentLinks), ReleaseDate = str(ReleaseDate))
+                         TorrentLink1 = str(TorrentLink1), ReleaseDate = str(ReleaseDate))
             q.put() #assume successful entry if good values
             return True
         except:
