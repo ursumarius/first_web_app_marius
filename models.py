@@ -9,18 +9,26 @@ from google.appengine.ext import db
 render_str = jinja_util.render_str
 valid_pw = utilities_mu.valid_pw
 make_pw_hash = utilities_mu.make_pw_hash
-class Post(db.Model):
-    subject = db.StringProperty(required = True)
-    content = db.TextProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
-    last_modified = db.DateTimeProperty(auto_now = True)
+class MovieListing(db.Model):
+    Title = db.StringProperty(required = True)
+    IMDB_link = db.LinkProperty(required = True)
+    Followed = db.IntegerProperty(required = True)
+    
+    Creators = db.StringProperty(required = False)
+    Actors = db.StringProperty(required = False)
+    
+    FoundTorrent = db.IntegerProperty(required = False)
+    TorrentLinks = db.StringProperty(required = False)
+    
+    ReleaseDate = db.DateTimeProperty(required = False)
+    Created = db.DateTimeProperty(auto_now_add = True)
+    Last_modified = db.DateTimeProperty(auto_now = True)
 
     def render(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("post.html", p = self)
+        return render_str("Movie_listing.html", listing = self)
     
-def single_post( post_id):
-    db_key = db.Key.from_path('Post', int(post_id) )
+def single_listing( listing_id):
+    db_key = db.Key.from_path('MovieListing', int(listing_id) )
     return db.get(db_key)    
             
 class Users(db.Model):
