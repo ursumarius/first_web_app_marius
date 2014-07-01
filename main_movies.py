@@ -21,6 +21,7 @@ from google.appengine.ext import db
 
 NewListing = models.MovieListing.NewListing
 FollowedChange = models.MovieListing.FollowedChange
+FoundTorrentChange = models.MovieListing.FoundTorrentChange
 MovieListing = models.MovieListing
 Users = models.Users
 signup = models.Users.signup
@@ -108,6 +109,11 @@ class RemoveMovie(MovieHandler):
             logging.error("Changed")
         else:
             logging.error("Couldnt change")
+        #self.write("RemoveMovie")
+        if (FoundTorrentChange(int(movie_id), 1)):
+            logging.error("Changed torrent")
+        else:
+            logging.error("Couldnt change torrent")
         #self.write("RemoveMovie")
         
     #def post(self, path_ext):

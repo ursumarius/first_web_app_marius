@@ -39,6 +39,19 @@ class MovieListing(db.Model):
             return False
         
     @classmethod
+    def FoundTorrentChange(cls, movie_id, truth):
+        db_key = db.Key.from_path('MovieListing', movie_id)
+        q = db.get(db_key)
+        if q and (truth == 1 or truth == 0 ):
+            
+            q.FoundTorrent = int(truth)
+            q.put()
+            #logging.error("Followed in db = %s"%str(q.Followed))
+            return True
+        else:
+            return False
+        
+    @classmethod
     def NewListing(cls, Title, IMDB_link, Followed = 1, Creators = "", Actors = "",
                    FoundTorrent = 0, TorrentLinks = "", ReleaseDate = ""):
         #assume all data is valid (e.g. link is link) -- how to handler errors while entering in DB?
