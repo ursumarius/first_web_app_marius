@@ -19,6 +19,7 @@ import re
 import time
 from google.appengine.ext import db
 
+NewListing = models.MovieListing.NewListing
 FollowedChange = models.MovieListing.FollowedChange
 MovieListing = models.MovieListing
 Users = models.Users
@@ -93,14 +94,13 @@ class AddMovie(MovieHandler):
         
     def post(self, IMDB_link):
         IMDB_entered = str(self.request.get("IMDB_link"))
+       
         #do validation according to API, save details in DB
-        #make sure URL is good-otherwise db crash
+        if not NewListing(Title = "Test", IMDB_link = IMDB_entered): #make sure URL is good-otherwise db crash
+            #bad values
+            self.render("AddMovie.html", error_IMDB_link = "This is not a link")
+       
         
-        #temp code to test.
-        q = MovieListing(Title = "Testing", IMDB_link = IMDB_entered, Followed = 1)
-        q.put()
-        #self.write(q.key().id())
-        #do validation according to API, save details in DB
         
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):

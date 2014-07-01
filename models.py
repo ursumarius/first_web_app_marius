@@ -37,7 +37,21 @@ class MovieListing(db.Model):
             return True
         else:
             return False
-
+        
+    @classmethod
+    def NewListing(cls, Title, IMDB_link, Followed = 1, Creators = "", Actors = "",
+                   FoundTorrent = 0, TorrentLinks = "", ReleaseDate = ""):
+        #assume all data is valid (e.g. link is link) -- how to handler errors while entering in DB?
+        try:
+            q = MovieListing(Title = str(Title), IMDB_link = str(IMDB_link), Followed = int(Followed),
+                         Creators = str(Creators), Actors = str(Actors), FoundTorrent = int(FoundTorrent),
+                         TorrentLinks = str(TorrentLinks), ReleaseDate = str(ReleaseDate))
+            q.put() #assume successful entry if good values
+            return True
+        except:
+            return False
+        
+        
 
     def render(self):
         return render_str("Movie_listing.html", listing = self)
