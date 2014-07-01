@@ -80,7 +80,16 @@ class MoviePage(MovieHandler):
     def get(self, movie_id):
        
         self.write("MoviePage")
-
+        
+class AddMovie(MovieHandler):
+    def get(self, movie_id):
+       
+        self.write("AddMovie")
+        
+class RemoveMovie(MovieHandler):
+    def get(self, movie_id):
+       
+        self.write("RemoveMovie")
         
     #def post(self, path_ext):
     #    login = self.request.cookies.get("login", "error no cookie")
@@ -99,6 +108,8 @@ class MoviePage(MovieHandler):
 
 PAGE_RE = r'((?:[a-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/Movie/?%s?' % PAGE_RE, MoviePage),
-                                ('/HomePage', HomePage),
+                                ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
+                                ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
+                                ('/Homepage', HomePage),
                                ],
                               debug=True)
