@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>New Movie</title>
+    <link type="text/css" rel="stylesheet" href="/static/main.css" />
+  </head>
+
+  <body>
+    <h2>Movie ID</h2>
+    <form method="post">
+      <table>
+        <tr>
+          <td class="label">
+            IMDB link
+          </td>
+          <td>
+            <input type="text" name="IMDB_link" value="{{IMDB_link}}" >
+          </td>
+          <td class="error">
+            {{error_IMDB_link}}
+          </td>
+        </tr>
+       </table>
+      <input type="submit">
+    </form>
+  </body>
+
+</html>

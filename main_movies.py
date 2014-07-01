@@ -82,9 +82,15 @@ class MoviePage(MovieHandler):
         self.write("MoviePage")
         
 class AddMovie(MovieHandler):
-    def get(self, movie_id):
-       
-        self.write("AddMovie")
+    def get(self, IMDB_link):
+        #check if valid immediately as in post
+        #if IMDB_link:
+        #    IMDB_link = str(IMDB_link)
+        IMDB_link = str(IMDB_link)    
+        self.render("AddMovie.html", IMDB_link = IMDB_link)
+    def post(self, IMDB_link):
+        IMDB_entered = self.request.get("IMDB_link")
+        #do validation according to API, save details in DB
         
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
