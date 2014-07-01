@@ -19,7 +19,9 @@ import re
 import time
 from google.appengine.ext import db
 
+
 NewListing = models.MovieListing.NewListing
+TorrentLink1Edit = models.MovieListing.TorrentLink1Edit
 FollowedChange = models.MovieListing.FollowedChange
 FoundTorrentChange = models.MovieListing.FoundTorrentChange
 MovieListing = models.MovieListing
@@ -109,28 +111,18 @@ class RemoveMovie(MovieHandler):
             logging.error("Changed")
         else:
             logging.error("Couldnt change")
-        #self.write("RemoveMovie")
+        
         if (FoundTorrentChange(int(movie_id), 1)):
             logging.error("Changed torrent")
         else:
             logging.error("Couldnt change torrent")
-        #self.write("RemoveMovie")
         
-    #def post(self, path_ext):
-    #    login = self.request.cookies.get("login", "error no cookie")
-    #    loggedin,user = correct_cookie(login)
-    #    if loggedin:
-    #        
-    #        q = Post.gql(("WHERE subject = :subject"), subject = str(path_ext))
-    #        q = q.get()
-    #        q.content = str(self.request.get('content'))
-    #        q.put()
-    #        time.sleep(0.1)
-    #        self.redirect("/wiki/%s"%path_ext)
-    #    else:
-    #        self.redirect("/wiki/login")
-    #    
-
+        if (TorrentLink1Edit(int(movie_id), "www.asd.com")):
+            logging.error("Changed torrentlink")
+        else:
+            logging.error("Couldnt change torrentlink")
+   
+   
 PAGE_RE = r'((?:[a-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/Movie/?%s?' % PAGE_RE, MoviePage),
                                 ('/AddMovie/?%s?' % PAGE_RE, AddMovie),

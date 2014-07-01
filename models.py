@@ -50,6 +50,17 @@ class MovieListing(db.Model):
             return True
         else:
             return False
+    @classmethod   
+    def TorrentLink1Edit(cls, movie_id, newlink):
+        db_key = db.Key.from_path('MovieListing', movie_id)
+        q = db.get(db_key)
+        if q and newlink:
+            q.TorrentLink1 = str(newlink)
+            q.put()
+            #logging.error("Followed in db = %s"%str(q.Followed))
+            return True
+        else:
+            return False
         
     @classmethod
     def NewListing(cls, Title, IMDB_link, Followed = 1, Creators = "", Actors = "",
