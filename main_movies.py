@@ -99,7 +99,9 @@ class AddMovie(MovieHandler):
         IMDB_entered = str(self.request.get("IMDB_link"))
        
         #do validation according to API, save details in DB
-        if not NewListing(Title = "Test", IMDB_link = IMDB_entered): #make sure URL is good-otherwise db crash
+        if not NewListing(Title = "Test", IMDB_link = IMDB_entered,
+                          Poster_link = "http://www.impawards.com/2014/posters/locke_ver2_xlg.jpg"):
+            #make sure URL is good-otherwise db crash
             #bad values
             self.render("AddMovie.html", error_IMDB_link = "This is not a link")
        
