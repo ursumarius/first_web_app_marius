@@ -5,4 +5,22 @@
   padding: 14px 10px;
   text-transform: uppercase;
 }
+.movie_listing{
+    height: 350px;
+    width: 200px;
+    text-align: center;
+    border: 2px dotted black;
+}
+
+.movie_title{
+    margin: auto;
+    
+}
+
+.movie_poster {
+    height: auto;
+    max-width: 175px;
+    max-height: 300px;
+    margin: auto;
+}
 

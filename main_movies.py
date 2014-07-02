@@ -78,7 +78,7 @@ class MovieHandler(webapp2.RequestHandler):
 
 class HomePage(MovieHandler):
   def get(self):
-        q = models.MovieListing.gql(("WHERE IMDB_link =:link"), link = "http://getbootstrap.com/css/")
+        q = models.MovieListing.gql("Where Followed= :one", one=1)
         p = list(q)
         logging.error("list(q)=%s"%p)
         self.render("front.html", listing = p)
