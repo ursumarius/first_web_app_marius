@@ -2,9 +2,8 @@
 
 {% block content %}
 
-  {% for p in posts %}
-    {{ p.render() | safe }}
-    <br><br>
+  {% for l in listing %}
+    {{ l.render() | safe }}
   {% endfor %}
 
 {% endblock %}

@@ -1,17 +1,26 @@
 
-<div class="listing">
-  <div class="listing-heading">
-    <div class="listing-title">
-      {{listing.Title}}
-    </div>
-
-    <div  class="listing-date">
-      
-      {{listing.created.strftime("%c")}}
-    </div>
+<div class="movie_listing">
+  <div class="movie_title">
+    <a href="/details/">{{listing.Title}}</a>
+  </div>
+  <div class="movie_poster">
+    <img src="{{listing.Poster_link}}" alt="not found" href="{{listing.IMDB_link}}">
   </div>
   
-  <div class="listing-content">
-    {{listing.IMDB_link }} 
+  <div class="movie_details">
+    
+    <div class="listing-followed">
+      Followed: {{listing.Followed}}
+    </div>
+    
+    <div class="listing-torrentlink">
+      TorrentLink: {{listing.TorrentLink1}}
+    </div>
+    
+    <div class="listing-release">
+      Release Date: 
+    </div>
+    
   </div>
 </div>
+  
