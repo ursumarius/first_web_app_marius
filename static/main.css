@@ -5,11 +5,33 @@
   padding: 14px 10px;
   text-transform: uppercase;
 }
+
+h1 {
+    text-align: center;
+    border-bottom: solid;
+}
+
+.content{
+    max-width: 1000px;
+    margin: auto;
+}
+
+.add_movie {
+    margin: auto;
+
+}
+
+img{
+    
+    max-height: 500px;
+    max-width: 400px;
+}
 .movie_listing{
-    height: 350px;
-    width: 200px;
+    padding: 10px;
+    max-width: 300px;
     text-align: center;
     border: 2px dotted black;
+    float: left
 }
 
 .movie_title{
@@ -22,5 +44,11 @@
     max-width: 175px;
     max-height: 300px;
     margin: auto;
+}
+
+.movie_details .table{
+    max-width: 200px;
+    margin: auto;
+    font-size: 12px;
 }
 

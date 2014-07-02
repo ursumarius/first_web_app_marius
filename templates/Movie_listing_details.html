@@ -1,27 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link type="text/css" rel="stylesheet" href="/static/bootstrap.min.css" />
-  <link type="text/css" rel="stylesheet" href="/static/main.css" />
+{% extends "base.html" %}
 
-  <title>Movie listing</title>
-</head>
-  <body>
-    <div class="listing">
-      <div class="listing-heading">
-        <div class="listing-title">
-          {{listing.Title}}
-        </div>
-    
-        <div  class="listing-date">
-          
-          {{listing.created.strftime("%c")}}
-        </div>
-      </div>
+{% block content %}
+<div style="text-align: center; width: 400px; margin: auto;">
+  
+  <div class="movie_details">
+    <table class="table">
+      <tr>
+      <td>Title:</td> <td>{{listing.Title}}</td>
+      </tr>
+      <tr>
+      <td>IMDB_link:</td> <td><a href="{{listing.IMDB_link}}">{{listing.IMDB_link}}</a></td>
+      </tr>
+      <tr>
+      <td>Followed:</td> <td>{{listing.Followed}}</td>
+      </tr>
+      <tr>
+      <td>Creators:</td> <td>{{listing.Creators}}</td>
+      </tr>
+      <tr>
+      <td>Actors:</td> <td>{{listing.Actors}}</td>
+      </tr>
+      <tr>
+      <td>Found Torrent:</td> <td>{{listing.FoundTorrent}}</td>
+      </tr>
+      <tr>
+      <td>Release Date:</td> <td>{{listing.ReleaseDate}}</td>
+      </tr>
+      <tr>
+      <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.TorrentLink1}}</a></td>
+      </tr>
+      <tr>
+      <td> Added:</td>  <td>{{listing.Created.strftime("%c")}}</td>
+      </tr>
       
-      <div class="listing-content">
-        {{listing.IMDB_link }} 
-      </div>
-    </div>
-  </body>
-</html>
+    
+    </table>  
+  </div>
+  <div class="movie_poster">
+    <img src="{{listing.Poster_link}}" alt="not found" href="{{listing.IMDB_link}}" class="img-responsive">
+  </div>
+</div> 
+  
+{% endblock %}

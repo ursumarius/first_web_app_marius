@@ -92,46 +92,57 @@ class MoviePage(MovieHandler):
 class AddMovie(MovieHandler):
     def get(self, IMDB_link):
         #check if valid immediately as in post
-        #check if already exists
+        #check if already exists by title and imdblink
         #if IMDB_link:
-        #    IMDB_link = str(IMDB_link)
+        
         IMDB_link = str(IMDB_link)    
         self.render("AddMovie.html", IMDB_link = IMDB_link)
         
     def post(self, IMDB_link):
         IMDB_entered = str(self.request.get("IMDB_link"))
-       
+        title = IMDB_entered[IMDB_entered.find("title/")+5:]
         #do validation according to API, save details in DB
-        if not NewListing(Title = "Test", IMDB_link = IMDB_entered,
-                          Poster_link = "http://www.impawards.com/2014/posters/locke_ver2_xlg.jpg"):
+        if not NewListing(Title = title, IMDB_link = IMDB_entered,
+                          Poster_link = "http://blogs.walkerart.org/filmvideo/files/2012/07/8mm_movie_film.jpg"):
             #make sure URL is good-otherwise db crash
             #bad values
             self.render("AddMovie.html", error_IMDB_link = "This is not a link")
-       
+        self.redirect("/Homepage")
         
         
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
-        if (FollowedChange(int(movie_id), 0)):
+        if (FollowedChange(int(movie_id), 1)):
             logging.error("Changed")
         else:
             logging.error("Couldnt change")
         
-        if (FoundTorrentChange(int(movie_id), 1)):
-            logging.error("Changed torrent")
+        #if (FoundTorrentChange(int(movie_id), 1)):
+        #    logging.error("Changed torrent")
+        #else:
+        #    logging.error("Couldnt change torrent")
+        #
+        #if (TorrentLink1Edit(int(movie_id), "www.asd.com")):
+        #    logging.error("Changed torrentlink")
+        #else:
+        #    logging.error("Couldnt change torrentlink")
+
+class DetailsMovie(MovieHandler):
+    def get(self, movie_name):
+        #problem with redirecting titles with space.
+        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+        p = list(q)
+        logging.error("p = %s"%p)
+        if p:
+            self.render("Movie_listing_details.html", listing = p[0])
         else:
-            logging.error("Couldnt change torrent")
-        
-        if (TorrentLink1Edit(int(movie_id), "www.asd.com")):
-            logging.error("Changed torrentlink")
-        else:
-            logging.error("Couldnt change torrentlink")
-   
+            self.write("Title Not Found")
    
 PAGE_RE = r'((?:[a-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/Movie/?%s?' % PAGE_RE, MoviePage),
                                 ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
+                                ('/Details/?%s?' % PAGE_RE, DetailsMovie),
                                 ('/Homepage', HomePage),
                                ],
                               debug=True)

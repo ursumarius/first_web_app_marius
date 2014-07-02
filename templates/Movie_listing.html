@@ -1,26 +1,24 @@
 
 <div class="movie_listing">
   <div class="movie_title">
-    <a href="/details/">{{listing.Title}}</a>
+    <a href="/details/{{listing.Title}}">{{listing.Title}}</a>
   </div>
   <div class="movie_poster">
     <img src="{{listing.Poster_link}}" alt="not found" href="{{listing.IMDB_link}}" class="img-responsive">
   </div>
   
   <div class="movie_details">
-    
-    <div class="listing-followed">
-      Followed: {{listing.Followed}}
-    </div>
-    
-    <div class="listing-torrentlink">
-      TorrentLink: {{listing.TorrentLink1}}
-    </div>
-    
-    <div class="listing-release">
-      Release Date: 
-    </div>
-    
+    <table class="table">
+      <tr>
+      <td>Followed:</td> <td>{{listing.Followed}}</td>
+      </tr>
+      <tr>
+      <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.FoundTorrent}}</a></td>
+      </tr>
+      <tr>
+      <td>Release Date:</td> <td>{{listing.ReleaseDate}}</td>
+      </tr>
+    </table>
   </div>
 </div>
   

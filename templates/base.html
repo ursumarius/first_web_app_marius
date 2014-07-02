@@ -8,11 +8,13 @@
 </head>
 
 <body>
-  <a href="/wiki" class="main-title">
-    Marius IMDB
+  <a href="/Homepage" class="main-title">
+    <h1>Marius IMDB</h1>
   </a>
   
-  <div id="content">
+  {% block form %}
+  {% endblock %}
+  <div class="content">
   {% block content %}
   {% endblock %}
   </div>

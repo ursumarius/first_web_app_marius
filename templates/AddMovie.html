@@ -1,29 +1,29 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <title>New Movie</title>
-    <link type="text/css" rel="stylesheet" href="/static/main.css" />
-  </head>
 
-  <body>
-    <h2>Movie ID</h2>
-    <form method="post">
+{% block form %}
+<div class= "add_movie">
+  <form method="post">
       <table>
         <tr>
-          <td class="label">
-            IMDB link
+          <td>
+            IMDB link 
           </td>
           <td>
-            <input type="text" name="IMDB_link" value="{{IMDB_link}}" >
+            <input class="form-control" type="text" size="55" name="IMDB_link">
           </td>
           <td class="error">
             {{error_IMDB_link}}
           </td>
         </tr>
+        <tr>
+          <td>
+          <button type="submit" class="btn btn-default">Add</button>
+          </td>
+        </tr>
        </table>
-      <input type="submit">
+      
     </form>
-  </body>
-
-</html>
+</div>
+{% endblock %}
+  
