@@ -112,11 +112,16 @@ class AddMovie(MovieHandler):
         
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
-        if (FollowedChange(int(movie_id), 1)):
-            logging.error("Changed")
+        if movie_id:
+            if (FollowedChange(int(movie_id), 0)):
+                logging.error("Changed")
+                time.sleep(0.5) #needed for nice db time lag, possibly with cache not needed.
+                self.redirect("/Homepage")
+            else:
+                logging.error("Couldnt change")
+                self.write('<div style="font-family: verdana;">Wrong link</div>')
         else:
-            logging.error("Couldnt change")
-        
+            self.write('<div style="font-family: verdana;">Wrong link</div>')
         #if (FoundTorrentChange(int(movie_id), 1)):
         #    logging.error("Changed torrent")
         #else:
