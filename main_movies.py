@@ -80,7 +80,7 @@ class HomePage(MovieHandler):
   def get(self):
         q = models.MovieListing.gql("Where Followed= :one", one=1)
         p = list(q)
-        logging.error("list(q)=%s"%p)
+        #logging.error("list(q)=%s"%p)
         self.render("front.html", listing = p)
         
         
@@ -130,15 +130,16 @@ class RemoveMovie(MovieHandler):
 class DetailsMovie(MovieHandler):
     def get(self, movie_name):
         #problem with redirecting titles with space.
+        logging.error("movie_name=~%s~'"%movie_name)
         q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
         p = list(q)
-        logging.error("p = %s"%p)
+        #logging.error("p = %s"%p)
         if p:
             self.render("Movie_listing_details.html", listing = p[0])
         else:
             self.write("Title Not Found")
    
-PAGE_RE = r'((?:[a-zA-Z0-9_-]+/?)*)?'
+PAGE_RE = r'((?:[\sa-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/Movie/?%s?' % PAGE_RE, MoviePage),
                                 ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
