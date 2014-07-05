@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <link type="text/css" rel="stylesheet" href="/static/bootstrap.min.css" />
   <link type="text/css" rel="stylesheet" href="/static/main.css" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Home Page</title>
 </head>
 
@@ -11,9 +11,16 @@
   <a href="/Homepage" class="main-title">
     <h1>Marius IMDB</h1>
   </a>
-  
+  <div class="container">
+    <div class="navigation">
+      <a href="/AddMovie">Add New Movie |</a>
+      <a href="/RemoveMovie">| Remove Movie</a>
+    </div>
+  </div>
+  <div class="form">
   {% block form %}
   {% endblock %}
+  </div>
   <div class="content">
   {% block content %}
   {% endblock %}
