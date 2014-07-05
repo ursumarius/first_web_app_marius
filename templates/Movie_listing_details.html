@@ -1,46 +1,50 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="text-align: center; width: 400px; margin: auto;">
-  
-  <div class="movie_details_extended">
-    <table class="table">
-      <tr>
-      <td>Title:</td> <td>{{listing.Title}}</td>
-      </tr>
-      <tr>
-      <td>IMDB_link:</td> <td><a href="{{listing.IMDB_link}}">{{listing.IMDB_link}}</a></td>
-      </tr>
-      <tr>
-      <td>Followed:</td> <td>{{listing.Followed}}</td>
-      </tr>
-      <tr>
-      <td>Creators:</td> <td>{{listing.Creators}}</td>
-      </tr>
-      <tr>
-      <td>Actors:</td> <td>{{listing.Actors}}</td>
-      </tr>
-      <tr>
-      <td>Found Torrent:</td> <td>{{listing.FoundTorrent}}</td>
-      </tr>
-      <tr>
-      <td>Release Date:</td> <td>{{listing.ReleaseDate}}</td>
-      </tr>
-      <tr>
-      <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.TorrentLink1}}</a></td>
-      </tr>
-      <tr>
-      <td> Added:</td>  <td>{{listing.Created.strftime("%c")}}</td>
-      </tr>
-       <tr>
-      <td><a href="/RemoveMovie/{{listing.key().id()}}">Stop Following</a></td><td></td>
-      </tr>
-    
-    </table>  
+  <div class="col-md-3">
   </div>
-  <div class="movie_poster">
-    <img src="{{listing.Poster_link}}" alt="not found" href="{{listing.IMDB_link}}" class="img-responsive">
+  <div class="col-md-6">
+    <div class="movie_details_extended">
+      <table class="table">
+        <tr>
+        <td>Title:</td> <td>{{listing.Title}}</td>
+        </tr>
+        <tr>
+        <td>IMDB_link:</td> <td><a href="{{listing.IMDB_link}}">{{listing.IMDB_link}}</a></td>
+        </tr>
+        <tr>
+        <td>Followed:</td> <td>{{listing.Followed}}</td>
+        </tr>
+        <tr>
+        <td>Creators:</td> <td>{{listing.Creators}}</td>
+        </tr>
+        <tr>
+        <td>Actors:</td> <td>{{listing.Actors}}</td>
+        </tr>
+        <tr>
+        <td>Found Torrent:</td> <td>{{listing.FoundTorrent}}</td>
+        </tr>
+        <tr>
+        <td>Release Date:</td> <td>{{listing.ReleaseDate}}</td>
+        </tr>
+        <tr>
+        <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.TorrentLink1}}</a></td>
+        </tr>
+        <tr>
+        <td> Added:</td>  <td>{{listing.Created.strftime("%c")}}</td>
+        </tr>
+         <tr>
+        <td><a href="/RemoveMovie/{{listing.key().id()}}">Stop Following</a></td><td></td>
+        </tr>
+      
+      </table>
+    </div>
+    <div class="movie_poster">
+      <a href="{{listing.IMDB_link}}"><img src="{{listing.Poster_link}}" alt="not found"  class="img-responsive"></a>
+    </div>
   </div>
-</div> 
+  <div class="col-md-3">
+  </div>
+
   
 {% endblock %}

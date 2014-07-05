@@ -2,9 +2,9 @@
 
 
 {% block content %}
-
+  
   {% for l in listing %}
-    {{ l.render() | safe }}
+    <div class="col-md-3">{{ l.render() | safe }}</div>
   {% endfor %}
-
+  
 {% endblock %}
