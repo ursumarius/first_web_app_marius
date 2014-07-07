@@ -36,7 +36,7 @@ def escape_urlobj(title):
 def create_search_url(title, year, proxy):
     title = str(title)
     search = escape_urlobj(title+" "+year)
-    return proxy+search+"/0/99/0"
+    return proxy+search+"/0/99/200"
 
 def compute_length_match(title):
     count = 0
