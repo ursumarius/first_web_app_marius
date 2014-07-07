@@ -120,21 +120,25 @@ class AddMovie(MovieHandler):
         id_index = IMDB_entered.find("title/")+6
         imdb_id= IMDB_entered[id_index:id_index+9]
         logging.error("id=%s"%imdb_id)
-        j = create_json_details(imdb_id)
-        Title = j["Title"]
-        IMDB_link = "http://www.imdb.com/title/"+j["imdbID"]
-        Poster_link = j["Poster"]
-        Creators = j["Director"]+", "+j["Writer"]
-        Actors = j["Actors"]
-        ReleaseDate = j["Released"]
+        #exception handling here, what if not found?
+        try:
+            j = create_json_details(imdb_id)
+            Title = j["Title"]
+            IMDB_link = "http://www.imdb.com/title/"+j["imdbID"]
+            Poster_link = j["Poster"]
+            Creators = j["Director"]+", "+j["Writer"]
+            Actors = j["Actors"]
+            ReleaseDate = j["Released"]
         #do validation according to API, save details in DB
         
-        if not NewListing(Title = Title, IMDB_link = IMDB_link,
-                          Poster_link = Poster_link, Creators = Creators, Actors = Actors, ReleaseDate = ReleaseDate):
-            self.render("AddMovie.html", error_IMDB_link = "This is not a link")
-        else:
-            self.redirect("/Homepage")
-        
+            if not NewListing(Title = Title, IMDB_link = IMDB_link,
+                              Poster_link = Poster_link, Creators = Creators, Actors = Actors, ReleaseDate = ReleaseDate):
+                self.render("AddMovie.html", error_IMDB_link = "This is not a link")
+            else:
+                self.redirect("/Homepage")
+        except:
+            self.render("AddMovie.html", error_IMDB_link = "Error while acquiring or processing IMDB data")
+            
         
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
