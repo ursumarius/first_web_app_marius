@@ -1,14 +1,9 @@
 import os
-
-
-
 import webapp2
 import jinja_util
-
-
-
 import string
 import json
+import urllib2
 import datetime
 from google.appengine.api import memcache
 import time
@@ -75,6 +70,28 @@ class MovieHandler(webapp2.RequestHandler):
     #    memcache.set("top",value)
     #    return value
 
+def escape_urlobj(title):
+    title = str(title)
+    for i in range(len(title)):
+        if title[i]==' ' and len(title)>1 and i<len(title)-1:
+            print i
+            title=title[:i]+"%20"+title[i+1:]
+    return title
+
+def create_details_url(imdb_id, title= None, year=None):
+    url_open = "http://www.omdbapi.com/?i="+imdb_id
+    if title:
+        title=escape_urlobj(title)
+        url_open = url_open+"&t="+title
+    if year:
+        url_open = url_open+"&y="+year
+    return url_open
+
+def create_json_details(imdb_id, title=None, year=None):
+    url_open = create_details_url(imdb_id, title= None, year=None)
+    contents = urllib2.urlopen(url_open)
+    contents_str = contents.read()
+    return json.loads(contents_str)
 
 class HomePage(MovieHandler):
   def get(self):
@@ -95,16 +112,25 @@ class AddMovie(MovieHandler):
         #check if already exists by title and imdblink
         #if IMDB_link:
         
-        IMDB_link = str(IMDB_link)    
+        IMDB_link = str(IMDB_link)  
         self.render("AddMovie.html", IMDB_link = IMDB_link)
         
     def post(self, IMDB_link):
         IMDB_entered = str(self.request.get("IMDB_link"))
-        title = IMDB_entered[IMDB_entered.find("title/")+5:]
+        id_index = IMDB_entered.find("title/")+6
+        imdb_id= IMDB_entered[id_index:id_index+9]
+        logging.error("id=%s"%imdb_id)
+        j = create_json_details(imdb_id)
+        Title = j["Title"]
+        IMDB_link = "http://www.imdb.com/title/"+j["imdbID"]
+        Poster_link = j["Poster"]
+        Creators = j["Director"]+", "+j["Writer"]
+        Actors = j["Actors"]
+        ReleaseDate = j["Released"]
         #do validation according to API, save details in DB
         
-        if not NewListing(Title = title, IMDB_link = IMDB_entered,
-                          Poster_link = "http://blogs.walkerart.org/filmvideo/files/2012/07/8mm_movie_film.jpg"):
+        if not NewListing(Title = Title, IMDB_link = IMDB_link,
+                          Poster_link = Poster_link, Creators = Creators, Actors = Actors, ReleaseDate = ReleaseDate):
             self.render("AddMovie.html", error_IMDB_link = "This is not a link")
         else:
             self.redirect("/Homepage")
