@@ -73,7 +73,7 @@ class MovieHandler(webapp2.RequestHandler):
 def escape_urlobj(title):
     title = str(title)
     for i in range(len(title)):
-        if title[i]==' ' and len(title)>1 and i<len(title)-1:
+        if title[i]==' ' and len(title)>1 and i<len(title):
             print i
             title=title[:i]+"%20"+title[i+1:]
     return title
