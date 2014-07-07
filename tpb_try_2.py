@@ -18,7 +18,7 @@ def find_match(found, title, year):
     for title in titles:
         PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
         
-        matchObj = re.match( PAGE_RE,found, re.M)
+        matchObj = re.match( PAGE_RE,found, re.M|re.I)
         if matchObj:
            return True
         
