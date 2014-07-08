@@ -8,11 +8,12 @@ def test():
     lis.append(inspect_tpb("Drive", "2011"))
     lis.append(inspect_tpb("Pain and Gain", "2013"))
     lis.append(inspect_tpb("The beaver", "2011"))
-##    lis.append(inspect_tpb("expendables 3", "2014"))
-##    lis.append(inspect_tpb("a long way down", "2014"))
-##    lis.append(inspect_tpb("The anomaly", "2014"))
-##    lis.append(inspect_tpb("the equalizer", "2014"))
+    lis.append(inspect_tpb("the expendables 3", "2014"))
+    lis.append(inspect_tpb("a long way down", "2014"))
+    lis.append(inspect_tpb("The anomaly", "2014"))
+    lis.append(inspect_tpb("the equalizer", "2014"))
     return lis
+
 
 def inspect_tpb(title, year, diff_proxy = None):
     def create_titles(title):
@@ -73,17 +74,20 @@ def inspect_tpb(title, year, diff_proxy = None):
         t = t.read()
         index = 9000
         m = compute_length_match(title)
+        hit = 0
         for i in range(3):
             index = t.find("Details for",index)
+            if index == -1:
+                return None
             title_found = t[index+12: index+12+m]
             index = index + 3* 1100
-            
-            if find_match(title_found, title, year):
-                return search_url
+            if not re.search( r'trailer', title_found, re.M|re.I):
+                if hit == 1 and find_match(title_found, title, year):
+                    return search_url
+                hit = 1
         return None
     except:
         if diff_proxy is not None:
             return "Error"
         else:
             return inspect_tpb(title, year, proxy_index)
-        
