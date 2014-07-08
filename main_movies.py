@@ -39,36 +39,8 @@ class MovieHandler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
      
-    #def post_wiki(self, post = None, update = False):
-    #    key = "top"
-    #    posts = memcache.get(key)
-    #    old_posts = posts
-    #    timeupdated = time.time()
-    #    memcache.set("timeupdated", timeupdated)
-    #    if not posts or (update):
-    #        posts = self.update_cache(post)
-    #       
-    #    return posts,memcache.get("timeupdated")
-    #def Cached_post(self,post_id):
-    #    key = post_id
-    #    post = memcache.get(key)
-    #    if post is None:
-    #        post = single_post(post_id)
-    #        memcache.set(key, post)
-    #        timeupdated = time.time()
-    #        memcache.set("timeupdated%s"%post_id, timeupdated)
-    #    return post,memcache.get("timeupdated%s"%post_id)
-    #
-    #def update_cache(self, post):
-    #    value = memcache.get("top")
-    #    if not value:
-    #        value = []
-    #    elif len(value) == 10:
-    #        value.pop()
-    #    if post:
-    #        value.insert(0,post)
-    #    memcache.set("top",value)
-    #    return value
+ 
+#stuff for IMDB API################
 
 def escape_urlobj(title):
     title = str(title)
@@ -93,19 +65,97 @@ def create_json_details(imdb_id, title=None, year=None):
     contents_str = contents.read()
     return json.loads(contents_str)
 
+# stuff for IMDB API END##################################
+# stuff for TPB API##################################
+
+def inspect_tpb(title, year, diff_proxy = None):
+    def create_titles(title):
+        title = str(title)
+        title_p = title
+        for i in range(len(title)):
+            if title[i]==' ' and len(title)>1 and i<len(title):
+                print i
+                title_p=title_p[:i]+"."+title_p[i+1:]
+        return [title, title_p]
+    
+    def find_match(found, title, year):
+        titles = create_titles(title)
+        for title in titles:
+            PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
+            
+            matchObj = re.match( PAGE_RE,found, re.M|re.I)
+            if matchObj:
+               return True
+        return None
+    
+    def escape_urlobj(title):
+        title = str(title)
+        for i in range(len(title)):
+            if title[i]==' ' and len(title)>1 and i<len(title):
+                print i
+                title=title[:i]+"%20"+title[i+1:]
+        return title
+    
+    def compute_length_match(title):
+        count = 0
+        for element in title:
+            if element == " ":
+                count+=1
+        return count+len(title)+6
+    def create_search_url(title, year, proxy):
+        title = str(title)
+        search = escape_urlobj(title+" "+year)
+        return proxy+search+"/0/99/200"
+    
+    def pick_index(title, length_proxies):
+        if len(title)>4:
+            return (ord(title[-1]) + ord(title[-2]) + ord(title[-3]))%length_proxies
+        else:
+            return 0
+
+   
+    proxies = ["http://pirateproxy.in", "http://thebootlegbay.com", "http://thepiratebay.mg", "http://myproxypirate.com"]
+    proxy_index = pick_index(title, len(proxies))
+    if (diff_proxy is not None) and (diff_proxy == proxy_index):
+        proxy_index = (proxy_index + 1) % (len(proxies))
+    
+    proxy = proxies[proxy_index]
+    proxy_search = proxy+"/search/"
+    search_url = create_search_url(title, year, proxy_search)
+    try:
+        t = urllib2.urlopen(search_url)
+        t = t.read()
+        index = 9000
+        m = compute_length_match(title)
+        for i in range(3):
+            index = t.find("Details for",index)
+            title_found = t[index+12: index+12+m]
+            index = index + 3* 1100
+            
+            if find_match(title_found, title, year):
+                return search_url
+        return None
+    except:
+        if diff_proxy is not None:
+            return "Error"
+        else:
+            return inspect_tpb(title, year, proxy_index)
+
+def update_torrent(obj_movie):
+    findings = inspect_tpb(p[0].Title, p[0].ReleaseDate.strftime("%y"))
+    if findings and findings != "Error":
+        #update db with link
+        pass
+#stuff for TPB API END##################################
+
 class HomePage(MovieHandler):
-  def get(self):
+    def get(self):
         q = models.MovieListing.gql("Where Followed= :one", one=1)
         p = list(q)
         #logging.error("list(q)=%s"%p)
         self.render("front.html", listing = p)
         
-        
-class MoviePage(MovieHandler):
-    def get(self, movie_id):
-       
-        self.write("MoviePage")
-        
+      
 class AddMovie(MovieHandler):
     def get(self, IMDB_link):
         #check if valid immediately as in post
@@ -163,6 +213,7 @@ class RemoveMovie(MovieHandler):
         #    logging.error("Couldnt change torrentlink")
 
 class DetailsMovie(MovieHandler):
+    
     def get(self, movie_name):
         #problem with redirecting titles with space.
         logging.error("movie_name=~%s~'"%movie_name)
@@ -173,10 +224,19 @@ class DetailsMovie(MovieHandler):
             self.render("Movie_listing_details.html", listing = p[0])
         else:
             self.write("Title Not Found")
-   
+    def post(self, movie_name):
+        #self.write("Please Wait for update")
+        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+        p = list(q)
+        if p:
+            #update_torrent(p[0]):
+            #self.write(str(p[0].Title))#, p[0].ReleaseDate.strftime("%y")
+            self.write(str(p[0].ReleaseDate.strftime("%y")))
+            #change last updated info -- add function in models, add place in template.
+        
+        
 PAGE_RE = r'((?:[\sa-zA-Z0-9_-]+/?)*)?'
-app = webapp2.WSGIApplication([('/Movie/?%s?' % PAGE_RE, MoviePage),
-                                ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
+app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
                                 ('/Homepage', HomePage),
