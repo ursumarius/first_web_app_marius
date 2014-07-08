@@ -13,6 +13,7 @@ def create_titles(title):
 
 
 year = "2014"
+PAGE_RE = r'((?:[\s.a-zA-Z0-9_-]+/?)*)?'
 
 def find_match(found, title, year):
     titles = create_titles(title)

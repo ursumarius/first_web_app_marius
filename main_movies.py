@@ -250,7 +250,7 @@ class DetailsMovie(MovieHandler):
         time.sleep(1)
         self.redirect("/Details/%s"%movie_name)   
         
-PAGE_RE = r'((?:[\sa-zA-Z0-9_-]+/?)*)?'
+PAGE_RE = r'((?:[\s\.\:\!\'a-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
