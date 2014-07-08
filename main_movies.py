@@ -178,6 +178,7 @@ class HomePage(MovieHandler):
                 logging.error("One done")
                 #self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
                 time.sleep(2)
+        self.redirect("/Homepage")
         
         
       
