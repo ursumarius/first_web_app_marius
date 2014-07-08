@@ -2,8 +2,19 @@ import urllib2
 import json
 import re
 
+def test():
+    lis= []
+    lis.append(inspect_tpb("The Grand Budapest Hotel", "2014"))
+    lis.append(inspect_tpb("Drive", "2011"))
+    lis.append(inspect_tpb("Pain and Gain", "2013"))
+    lis.append(inspect_tpb("The beaver", "2011"))
+##    lis.append(inspect_tpb("expendables 3", "2014"))
+##    lis.append(inspect_tpb("a long way down", "2014"))
+##    lis.append(inspect_tpb("The anomaly", "2014"))
+##    lis.append(inspect_tpb("the equalizer", "2014"))
+    return lis
 
-def inspect_tpb(title, year):
+def inspect_tpb(title, year, diff_proxy = None):
     def create_titles(title):
         title = str(title)
         title_p = title
@@ -42,7 +53,19 @@ def inspect_tpb(title, year):
         search = escape_urlobj(title+" "+year)
         return proxy+search+"/0/99/200"
     
-    proxy = "http://pirateproxy.in"
+    def pick_index(title, length_proxies):
+        if len(title)>4:
+            return (ord(title[-1]) + ord(title[-2]) + ord(title[-3]))%length_proxies
+        else:
+            return 0
+
+   
+    proxies = ["http://pirateproxy.in", "http://thebootlegbay.com", "http://thepiratebay.mg", "http://myproxypirate.com"]
+    proxy_index = pick_index(title, len(proxies))
+    if (diff_proxy is not None) and (diff_proxy == proxy_index):
+        proxy_index = (proxy_index + 1) % (len(proxies))
+    
+    proxy = proxies[proxy_index]
     proxy_search = proxy+"/search/"
     search_url = create_search_url(title, year, proxy_search)
     try:
@@ -54,10 +77,13 @@ def inspect_tpb(title, year):
             index = t.find("Details for",index)
             title_found = t[index+12: index+12+m]
             index = index + 3* 1100
-            #try match, and return search_url if found, else loop more
+            
             if find_match(title_found, title, year):
                 return search_url
         return None
     except:
-        return "Error"
-    
+        if diff_proxy is not None:
+            return "Error"
+        else:
+            return inspect_tpb(title, year, proxy_index)
+        
