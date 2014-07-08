@@ -209,7 +209,7 @@ class AddMovie(MovieHandler):
             if not NewListing(Title = Title, IMDB_link = IMDB_link,
                               Poster_link = Poster_link, Creators = Creators,
                               Actors = Actors, ReleaseDate = ReleaseDate):
-                self.render("AddMovie.html", error_IMDB_link = "Error with DB")
+                self.render("AddMovie.html", error_IMDB_link = "Error with DB, maybe already entered")
             else:
                 self.redirect("/Homepage")
         except:
