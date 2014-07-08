@@ -168,10 +168,11 @@ class HomePage(MovieHandler):
         p = list(q)
         number_of_titles = len(p)
         for listing in p:
-            update_torrent(listing.Title)
-            logging.error("One done")
-            #self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
-            time.sleep(2)
+            if listing.FoundTorrent == 0:
+                update_torrent(listing.Title)
+                logging.error("One done")
+                #self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
+                time.sleep(2)
         
         
       
