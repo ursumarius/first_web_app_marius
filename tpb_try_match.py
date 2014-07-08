@@ -14,6 +14,9 @@ def create_titles(title):
 
 year = "2014"
 PAGE_RE = r'((?:[\s.a-zA-Z0-9_-]+/?)*)?'
+title_found1 = "Divergent 2014 720p HDTS Line Audio x264 Pimp4003"
+title_found2 = "Divergent 2014 TS Xvid Mp3-MiLLENiUM"
+
 
 def find_match(found, title, year):
     titles = create_titles(title)

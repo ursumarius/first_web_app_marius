@@ -82,7 +82,7 @@ def inspect_tpb(title, year, diff_proxy = None):
         for title in titles:
             PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
             
-            matchObj = re.match( PAGE_RE,found, re.M|re.I)
+            matchObj = re.search( PAGE_RE,found, re.M|re.I)
             if matchObj:
                return True
         return None
@@ -131,9 +131,10 @@ def inspect_tpb(title, year, diff_proxy = None):
             index = t.find("Details for",index)
             if index == -1:
                 return None
-            title_found = t[index+12: index+12+m]
+            index2 = t.find('">', index)
+            title_found = t[index+12: index2]
             index = index + 3* 1100
-            if not re.search( r'trailer', title_found, re.M|re.I):
+            if not (re.search( r'TS', title_found, re.M) or re.search( r'trailer', title_found, re.M|re.I)):
                 if hit == 1 and find_match(title_found, title, year):
                     return search_url
                 hit = 1
