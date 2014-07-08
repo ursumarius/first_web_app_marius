@@ -43,11 +43,11 @@ class MovieListing(db.Model):
             return False
         
     @classmethod
-    def FoundTorrentChange(cls, title, url):
+    def FoundTorrentChange(cls, title, url, truth):
         q = MovieListing.gql("Where Title= :title", title=title)
         p = list(q)
         if p[0]:
-            p[0].FoundTorrent = 1
+            p[0].FoundTorrent = truth
             p[0].TorrentLink1 = url
             p[0].Last_found_check = datetime.date.today()
             p[0].put()

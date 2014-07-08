@@ -146,9 +146,11 @@ def update_torrent(movie_name):
     p = list(q)
     obj_movie = p[0]
     findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"))
-    logging.error("Findings=%s"%findings)
-    if findings and findings != "Error":
-        FoundTorrentChange(movie_name, findings)
+    if findings != "Error":
+        truth = 0
+        if findings:
+            truth = 1
+        FoundTorrentChange(movie_name, findings, truth)
         return True
     return False
 #stuff for TPB API END##################################
@@ -159,8 +161,18 @@ class HomePage(MovieHandler):
         p = list(q)
         #logging.error("list(q)=%s"%p)
         self.render("front.html", listing = p)
+        
     def post(self):
-        pass
+        #self.write("Updating")
+        q = models.MovieListing.gql("Where Followed= :one", one=1)
+        p = list(q)
+        number_of_titles = len(p)
+        for listing in p:
+            update_torrent(listing.Title)
+            logging.error("One done")
+            #self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
+            time.sleep(2)
+        
         
       
 class AddMovie(MovieHandler):
