@@ -10,7 +10,7 @@
       <a href="/Details/{{listing.Title}}">{{listing.Title}}</a>
     </div>
     <div class="movie_poster">
-      <img src="{{listing.Poster_link}}" alt="not found" href="{{listing.IMDB_link}}" class="img-responsive">
+      <a href="{{listing.TorrentLink1}}"><img src="{{listing.Poster_link}}" alt="not found" class="img-responsive"></a>
     </div>
     
     
@@ -18,18 +18,11 @@
     <div class="movie_details">
       <table class="table">
         <tr>
-        <td>Followed:</td> <td>{{listing.Followed}}</td>
+        <td>Release:</td> <td>{{listing.ReleaseDate.strftime("%d %b %Y")}}</td>
         </tr>
         <tr>
-        <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.FoundTorrent}}</a></td>
+        <td>Actors:</td> <td class= "actors_description">{{listing.Actors}}</td>
         </tr>
-        <tr>
-        <td>Release Date:</td> <td>{{listing.ReleaseDate.strftime("%d %b %Y")}}</td>
-        </tr>
-        <tr>
-        <td><a href="/RemoveMovie/{{listing.key().id()}}">Stop Following</a></td><td></td>
-        </tr>
-        
       </table>
     </div>
   </div>

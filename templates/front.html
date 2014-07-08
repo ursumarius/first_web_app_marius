@@ -3,8 +3,16 @@
 
 {% block content %}
   
+  
+  
   {% for l in listing %}
-    <div class="col-md-3">{{ l.render() | safe }}</div>
+    {% if ((listing.index(l)+1)%4 == 0) %}
+    <div class="row">
+    {% else %}
+    <div style="display: inline;">
+    {% endif %}
+    
+    <div class="col-xs-3 col-sm-3">{{ l.render() | safe }}</div></div>
   {% endfor %}
   
 {% endblock %}

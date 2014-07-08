@@ -30,12 +30,19 @@ img{
     
 }
 
+.actors_description{
+    
+    font-size: 0.9em;
+}
+
 .movie_listing{
     
     max-width: 300px;
+    min-height: 400px;
     text-align: center;
     border: 2px dotted black;
-    float: left
+    float: left;
+    margin-bottom: 30px;
 }
 
 .movie_title{
