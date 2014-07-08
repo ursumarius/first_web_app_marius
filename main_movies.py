@@ -157,7 +157,7 @@ def update_torrent(movie_name):
 
 class HomePage(MovieHandler):
     def get(self):
-        q = models.MovieListing.gql("Where Followed= :one", one=1)
+        q = models.MovieListing.gql("Where Followed= :one Order by FoundTorrent desc", one=1)
         p = list(q)
         #logging.error("list(q)=%s"%p)
         self.render("front.html", listing = p)

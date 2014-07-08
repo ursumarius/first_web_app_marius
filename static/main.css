@@ -31,7 +31,7 @@ img{
 }
 
 .movie_listing{
-    padding: 10px;
+    
     max-width: 300px;
     text-align: center;
     border: 2px dotted black;
@@ -45,9 +45,12 @@ img{
 
 .movie_poster {
     height: auto;
-    max-width: 175px;
-    max-height: 300px;
+    max-width: 220px;
+    max-height: 320px;
     margin: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 5px;
 }
 
 .movie_details .table{
