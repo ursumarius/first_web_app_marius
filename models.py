@@ -6,6 +6,7 @@ import jinja_util
 from collections import namedtuple
 from google.appengine.ext import db
 import logging
+import datetime
 
 render_str = jinja_util.render_str
 valid_pw = utilities_mu.valid_pw
@@ -22,8 +23,9 @@ class MovieListing(db.Model):
     
     FoundTorrent = db.IntegerProperty(required = False)
     TorrentLink1 = db.StringProperty(required = False)
+    Last_found_check = db.DateProperty(required = True)
     
-    ReleaseDate = db.StringProperty(required = False)
+    ReleaseDate = db.DateProperty(required = False)
     Created = db.DateTimeProperty(auto_now_add = True)
     Last_modified = db.DateTimeProperty(auto_now = True)
     
@@ -41,13 +43,14 @@ class MovieListing(db.Model):
             return False
         
     @classmethod
-    def FoundTorrentChange(cls, movie_id, truth):
-        db_key = db.Key.from_path('MovieListing', movie_id)
-        q = db.get(db_key)
-        if q and (truth == 1 or truth == 0 ):
-            
-            q.FoundTorrent = int(truth)
-            q.put()
+    def FoundTorrentChange(cls, title, url):
+        q = MovieListing.gql("Where Title= :title", title=title)
+        p = list(q)
+        if p[0]:
+            p[0].FoundTorrent = 1
+            p[0].TorrentLink1 = url
+            p[0].Last_found_check = datetime.date.today()
+            p[0].put()
             #logging.error("Followed in db = %s"%str(q.Followed))
             return True
         else:
@@ -66,12 +69,13 @@ class MovieListing(db.Model):
         
     @classmethod
     def NewListing(cls, Title, IMDB_link, Poster_link, Followed = 1, Creators = "", Actors = "",
-                   FoundTorrent = 0, TorrentLink1 = "", ReleaseDate = "0"):
+                   FoundTorrent = 0, TorrentLink1 = "", ReleaseDate = None):
         #assume all data is valid (e.g. link is link) -- how to handler errors while entering in DB?
         try:
-            q = MovieListing(Title = str(Title), IMDB_link = str(IMDB_link), Poster_link = str(Poster_link), Followed = int(Followed),
-                         Creators = str(Creators), Actors = str(Actors), FoundTorrent = int(FoundTorrent),
-                         TorrentLink1 = str(TorrentLink1), ReleaseDate = str(ReleaseDate))
+            q = MovieListing(Title = Title, IMDB_link = IMDB_link, Poster_link = Poster_link, Followed = Followed,
+                         Creators = Creators, Actors = Actors, FoundTorrent = FoundTorrent,
+                         TorrentLink1 = str(TorrentLink1), Last_found_check = datetime.date.today(),
+                         ReleaseDate = ReleaseDate)
             q.put() #assume successful entry if good values
             return True
         except:

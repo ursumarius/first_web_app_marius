@@ -6,7 +6,6 @@ import json
 import urllib2
 import datetime
 from google.appengine.api import memcache
-import time
 import logging
 import utilities_mu
 import models
@@ -141,11 +140,17 @@ def inspect_tpb(title, year, diff_proxy = None):
         else:
             return inspect_tpb(title, year, proxy_index)
 
-def update_torrent(obj_movie):
-    findings = inspect_tpb(p[0].Title, p[0].ReleaseDate.strftime("%y"))
+def update_torrent(movie_name):
+    
+    q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+    p = list(q)
+    obj_movie = p[0]
+    findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"))
+    logging.error("Findings=%s"%findings)
     if findings and findings != "Error":
-        #update db with link
-        pass
+        FoundTorrentChange(movie_name, findings)
+        return True
+    return False
 #stuff for TPB API END##################################
 
 class HomePage(MovieHandler):
@@ -154,6 +159,8 @@ class HomePage(MovieHandler):
         p = list(q)
         #logging.error("list(q)=%s"%p)
         self.render("front.html", listing = p)
+    def post(self):
+        pass
         
       
 class AddMovie(MovieHandler):
@@ -169,7 +176,7 @@ class AddMovie(MovieHandler):
         IMDB_entered = str(self.request.get("IMDB_link"))
         id_index = IMDB_entered.find("title/")+6
         imdb_id= IMDB_entered[id_index:id_index+9]
-        logging.error("id=%s"%imdb_id)
+        #logging.error("id=%s"%imdb_id)
         #exception handling here, what if not found?
         try:
             j = create_json_details(imdb_id)
@@ -178,16 +185,17 @@ class AddMovie(MovieHandler):
             Poster_link = j["Poster"]
             Creators = j["Director"]+", "+j["Writer"]
             Actors = j["Actors"]
-            ReleaseDate = j["Released"]
+            ReleaseDate = datetime.datetime.strptime(j["Released"], "%d %b %Y").date()
         #do validation according to API, save details in DB
-        
+            
             if not NewListing(Title = Title, IMDB_link = IMDB_link,
-                              Poster_link = Poster_link, Creators = Creators, Actors = Actors, ReleaseDate = ReleaseDate):
-                self.render("AddMovie.html", error_IMDB_link = "This is not a link")
+                              Poster_link = Poster_link, Creators = Creators,
+                              Actors = Actors, ReleaseDate = ReleaseDate):
+                self.render("AddMovie.html", error_IMDB_link = "Error with DB")
             else:
                 self.redirect("/Homepage")
         except:
-            self.render("AddMovie.html", error_IMDB_link = "Error while acquiring or processing IMDB data")
+            self.render("AddMovie.html", error_IMDB_link = "Error with IMDB API")
             
         
 class RemoveMovie(MovieHandler):
@@ -225,15 +233,10 @@ class DetailsMovie(MovieHandler):
         else:
             self.write("Title Not Found")
     def post(self, movie_name):
-        #self.write("Please Wait for update")
-        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-        p = list(q)
-        if p:
-            #update_torrent(p[0]):
-            #self.write(str(p[0].Title))#, p[0].ReleaseDate.strftime("%y")
-            self.write(str(p[0].ReleaseDate.strftime("%y")))
-            #change last updated info -- add function in models, add place in template.
         
+        update_torrent(movie_name) #possiblity for some nice js message popup
+        time.sleep(1)
+        self.redirect("/Details/%s"%movie_name)   
         
 PAGE_RE = r'((?:[\sa-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),

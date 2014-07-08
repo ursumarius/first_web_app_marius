@@ -10,6 +10,9 @@
         <td>Title:</td> <td>{{listing.Title}}</td>
         </tr>
         <tr>
+        <td>Release Date:</td> <td>{{listing.ReleaseDate.strftime("%d %b %Y")}}</td>
+        </tr>
+        <tr>
         <td>IMDB_link:</td> <td><a href="{{listing.IMDB_link}}">{{listing.IMDB_link}}</a></td>
         </tr>
         <tr>
@@ -25,7 +28,7 @@
         <td>Found Torrent:</td> <td>{{listing.FoundTorrent}}</td>
         </tr>
         <tr>
-        <td>Release Date:</td> <td>{{listing.ReleaseDate}}</td>
+        <td>Last Checked Torrent:</td> <td>{{listing.Last_found_check.strftime("%c")}}</td>
         </tr>
         <tr>
         <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.TorrentLink1}}</a></td>

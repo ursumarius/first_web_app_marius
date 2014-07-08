@@ -17,7 +17,7 @@
       <td>TorrentLink 1:</td> <td><a href="{{listing.TorrentLink1}}">{{listing.FoundTorrent}}</a></td>
       </tr>
       <tr>
-      <td>Release Date:</td> <td>{{listing.ReleaseDate}}</td>
+      <td>Release Date:</td> <td>{{listing.ReleaseDate.strftime("%d %b %Y")}}</td>
       </tr>
       <tr>
       <td><a href="/RemoveMovie/{{listing.key().id()}}">Stop Following</a></td><td></td>
