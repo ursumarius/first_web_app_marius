@@ -31,6 +31,13 @@ body{
     
 }
 
+.add_movie_dialogue{
+    margin-top: 15%;
+    margin-left: 40%;
+    position: relative;
+     
+}
+
 .add_movie a{
     color: white;
     
