@@ -270,7 +270,14 @@ class DetailsMovie(MovieHandler):
         if post_checktorrent:
             update_torrent(movie_name) #possiblity for some nice js message popup
             time.sleep(1)
-            self.redirect("/Details/%s"%movie_name)   
+            self.redirect("/Details/%s"%movie_name)
+        if post_falseflag:
+            q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+            p = list(q)
+            
+            p[0].FoundTorrent = 0
+            p[0].put()
+            self.redirect("/Details/%s"%movie_name)
         
 PAGE_RE = r'((?:[\s\.\:\!\'a-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),
