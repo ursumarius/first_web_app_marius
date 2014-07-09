@@ -1,28 +1,39 @@
 
 body{
-    background-image: url('/static/stripes.jpg');
+    background-image: url('/static/51b599e635aee70236.jpg');
 }
 
 .title {
-  color: #5a5a5a;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 0px 10px;
-  text-transform: uppercase;
+    
+    font-family:  monospace;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 0px 10px;
+    text-transform: uppercase;
+    text-align: center;
+    
 }
 
 .nav{
     margin-bottom: 30px;
+    
+}
+.main-title{
+    color: white;
 }
 
-
-
 .add_movie{
-    
+    color: white;
     text-align: right;
     padding-right: 20px;
     position: relative;
     margin-top: -50px;
+    
+}
+
+.add_movie a{
+    color: white;
+    
 }
 
 
@@ -48,8 +59,10 @@ img{
     font-size: 0.9em;
 }
 
-
-
+.additional_nav{
+    position: relative;
+    margin-top: -25px; 
+}
 
 .additional_nav form{
     
