@@ -3,9 +3,22 @@
 
 {% block content %}
   
+  <div class="additional_nav">
+      <div class = "nav nav-pills">
+        
+        <form method="post">
+          <button type="submit" class="btn btn-default">Check Torrents</button>
+        </form>
+        <form method="get" action="Homepage">
+          <button type="submit" name="sortby" class="btn btn-default btn-xs" value="availability">By Availability</button>
+          <button type="submit" name="sortby" class="btn btn-default btn-xs" value="releasedate">By Release Date</button>
+        </form>
+      </div>
   
-  
+     
+  </div>
   {% for l in listing %}
+    
     {% if ((listing.index(l)+1)%4 == 0) %}
     <div class="row">
     {% else %}

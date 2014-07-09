@@ -162,9 +162,20 @@ def update_torrent(movie_name):
 
 class HomePage(MovieHandler):
     def get(self):
-        q = models.MovieListing.gql("Where Followed= :one Order by FoundTorrent desc", one=1)
+        sort_by = self.request.get("sortby")
+        logging.error("received sorting by %s"%sort_by)
+        sorting_column = "Created"
+        order = "desc"
+        if (sort_by == "availability"):
+            sorting_column = "FoundTorrent"
+            order =  "desc"
+        if (sort_by == "releasedate"):
+            sorting_column = "ReleaseDate"   
+            order = "asc"
+        q = models.MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
         p = list(q)
-        #logging.error("list(q)=%s"%p)
+        
+        
         self.render("front.html", listing = p)
         
     def post(self):
@@ -252,10 +263,14 @@ class DetailsMovie(MovieHandler):
         else:
             self.write("Title Not Found")
     def post(self, movie_name):
-        
-        update_torrent(movie_name) #possiblity for some nice js message popup
-        time.sleep(1)
-        self.redirect("/Details/%s"%movie_name)   
+        post_falseflag = self.request.get("falseflag")
+        post_checktorrent = self.request.get("checktorrent")
+        #logging.error("falseflag=%s"%post_falseflag)
+        #logging.error("checktorrent=%s"%post_checktorrent)
+        if post_checktorrent:
+            update_torrent(movie_name) #possiblity for some nice js message popup
+            time.sleep(1)
+            self.redirect("/Details/%s"%movie_name)   
         
 PAGE_RE = r'((?:[\s\.\:\!\'a-zA-Z0-9_-]+/?)*)?'
 app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),

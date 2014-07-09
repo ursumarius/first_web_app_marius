@@ -1,9 +1,9 @@
 
 <div class="movie_listing">
-    {% if listing.FoundTorrent %}
+    {% if listing.FoundTorrent ==1 %}
     <div class="found_torrent">
     {% else %}
-    <div>
+    <div class="not_found_torrent">
     {% endif %}
     
     <div class="movie_title">
