@@ -82,7 +82,7 @@ def inspect_tpb(title, year, diff_proxy = None):
         for title in titles:
             PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
             
-            matchObj = re.search( PAGE_RE,found, re.M|re.I)
+            matchObj = re.match( PAGE_RE,found, re.M|re.I)
             if matchObj:
                return True
         return None
