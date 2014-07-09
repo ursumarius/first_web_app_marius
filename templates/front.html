@@ -25,7 +25,10 @@
     <div style="display: inline;">
     {% endif %}
     
-    <div class="col-xs-3 col-sm-3">{{ l.render() | safe }}</div></div>
+    <div class="col-md-3">
+      {{ l.render() | safe }}
+    </div>
+    </div>
   {% endfor %}
   
 {% endblock %}

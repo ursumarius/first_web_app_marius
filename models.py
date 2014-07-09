@@ -95,14 +95,25 @@ class MovieListing(db.Model):
 def single_listing( listing_id):
     db_key = db.Key.from_path('MovieListing', int(listing_id) )
     return db.get(db_key)    
-            
+           
+           
+           
+           
+class System_tools(db.Model):
+    name = db.StringProperty(required = True)
+    value = db.StringProperty(required = False)
+    Created = db.DateTimeProperty(auto_now_add = True)
+    Last_modified = db.DateTimeProperty(auto_now = True)
+    
+    
+    
 class Users(db.Model):
     username = db.StringProperty(required = True)
     password_hash = db.StringProperty(required = True)
     email = db.StringProperty()
     #pass hash = db.StringProperty(required = True)
     
-    
+  
     
 #sign stuff 
     @classmethod

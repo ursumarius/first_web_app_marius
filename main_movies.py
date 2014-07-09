@@ -19,6 +19,7 @@ TorrentLink1Edit = models.MovieListing.TorrentLink1Edit
 FollowedChange = models.MovieListing.FollowedChange
 FoundTorrentChange = models.MovieListing.FoundTorrentChange
 MovieListing = models.MovieListing
+System_tools = models.System_tools
 Users = models.Users
 signup = models.Users.signup
 login_check = models.Users.login_check
@@ -36,6 +37,11 @@ class MovieHandler(webapp2.RequestHandler):
         return render_str(template, **params)
 
     def render(self, template, **kw):
+        
+        db_key = db.Key.from_path('System_tools', 5707702298738688)
+        q = db.get(db_key)
+        kw['system_tools_object'] = q
+        logging.error(kw)
         self.write(self.render_str(template, **kw))
      
  
@@ -162,9 +168,10 @@ def update_torrent(movie_name):
 
 class HomePage(MovieHandler):
     def get(self):
+        
         sort_by = self.request.get("sortby")
         logging.error("received sorting by %s"%sort_by)
-        sorting_column = "Created"
+        sorting_column = "FoundTorrent"
         order = "desc"
         if (sort_by == "availability"):
             sorting_column = "FoundTorrent"
@@ -172,7 +179,7 @@ class HomePage(MovieHandler):
         if (sort_by == "releasedate"):
             sorting_column = "ReleaseDate"   
             order = "asc"
-        q = models.MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
+        q = MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
         p = list(q)
         
         
@@ -187,8 +194,13 @@ class HomePage(MovieHandler):
             if listing.FoundTorrent == 0:
                 update_torrent(listing.Title)
                 logging.error("One done")
-                #self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
+                self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
                 time.sleep(2)
+        
+        db_key = db.Key.from_path('System_tools', 5707702298738688)
+        q = db.get(db_key)
+        q.value = "1"
+        q.put()
         self.redirect("/Homepage")
         
         
