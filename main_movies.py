@@ -168,8 +168,21 @@ def update_torrent(movie_name):
 #stuff for TPB API END##################################
 
 class HomePage(MovieHandler):
-    def get(self):
+    def get(self, ext):
+        def Post_as_dict(q):
+            dict_out = {"Title": str(q.Title),
+                        "IMDB_link":str(q.IMDB_link),
+                        "Followed": str(q.Followed),
+                        "Poster_link": str(q.Poster_link),
+                        "Creators": q.Creators,
+                        "Actors": (q.Actors),
+                        "FoundTorrent": str(q.FoundTorrent),
+                        "TorrentLink1": str(q.TorrentLink1),
+                        "Last_found_check": str(q.Last_found_check.strftime("%d %b %Y")),
+                        "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
+            return dict_out
         
+        logging.error(ext)
         sort_by = self.request.get("sortby")
         logging.error("received sorting by %s"%sort_by)
         sorting_column = "FoundTorrent"
@@ -182,32 +195,37 @@ class HomePage(MovieHandler):
             order = "asc"
         q = MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
         p = list(q)
+        if ext:
+            
+            dict_out = {}
+            for i in range(0,len(p),1):
+                current_entry = Post_as_dict(p[i])
+                dict_out["Movie"+str(i)] = current_entry
+            self.write(json.dumps(dict_out))  
+        else:    
+            self.render("front.html", listing = p, listing_length = len(p))
         
+    def post(self, ext):
+        self.write("Updating")
+        q = models.MovieListing.gql("Where Followed= :one", one=1)
+        p = list(q)
+        number_of_titles = len(p)
+        for listing in p:
+            if listing.FoundTorrent == 0:
+                update_torrent(listing.Title)
+                
+                self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
+                time.sleep(2)
         
-        self.render("front.html", listing = p, listing_length = len(p))
+        q = System_tools.gql("Where name= :title", title="Updatekeep")
+        p = list(q)
+        if p:
+            p[0].value = "1"
+            p[0].put()
+        else:
+            q=System_tools(name="Updatekeep", value="1")
+            q.put()
         
-    def post(self):
-        #self.write("Updating")
-        #q = models.MovieListing.gql("Where Followed= :one", one=1)
-        #p = list(q)
-        #number_of_titles = len(p)
-        #for listing in p:
-        #    if listing.FoundTorrent == 0:
-        #        update_torrent(listing.Title)
-        #        
-        #        self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
-        #        time.sleep(2)
-        #
-        #q = System_tools.gql("Where name= :title", title="Updatekeep")
-        #p = list(q)
-        #if p:
-        #    p[0].value = "1"
-        #    p[0].put()
-        #else:
-        #    q=System_tools(name="Updatekeep", value="1")
-        #    q.put()
-        logging.error("Updated all")
-        self.write("done")
         
         
       
@@ -221,6 +239,7 @@ class AddMovie(MovieHandler):
         self.render("AddMovie.html", IMDB_link = IMDB_link)
         
     def post(self, IMDB_link):
+        
         IMDB_entered = str(self.request.get("IMDB_link"))
         id_index = IMDB_entered.find("title/")+6
         imdb_id= IMDB_entered[id_index:id_index+9]
@@ -241,11 +260,53 @@ class AddMovie(MovieHandler):
                               Actors = Actors, ReleaseDate = ReleaseDate):
                 self.render("AddMovie.html", error_IMDB_link = "Error with DB, maybe already entered")
             else:
-                self.redirect("/Homepage")
+                self.redirect("/AddMovie")
         except:
             self.render("AddMovie.html", error_IMDB_link = "Error with IMDB API")
             
+class AddMovie_json(MovieHandler):
+    def get(self):
+        self.render("AddMovie_json.html")
         
+    def post(self):
+        JSON_entered = str(self.request.get("IMDB_link"))
+        JSON_movies = json.loads(JSON_entered)
+        i = 1
+        Movienr = 0
+        Errors = []
+        try:    
+            while i:
+                Movie_id = "Movie"+str(Movienr)
+                j = JSON_movies.get(Movie_id)#from json now
+                if not j:
+                    i = 0
+                else:
+                    Title = j["Title"]
+                    IMDB_link = j["IMDB_link"]
+                    Followed = j["Followed"]
+                    Poster_link = j["Poster_link"]
+                    Creators = j["Creators"]
+                    Actors = j["Actors"]
+                    FoundTorrent = j["FoundTorrent"]
+                    TorrentLink1 = j["TorrentLink1"]
+                    Last_found_check = datetime.datetime.strptime(j["Last_found_check"], "%d %b %Y").date()
+                    ReleaseDate = datetime.datetime.strptime(j["ReleaseDate"], "%d %b %Y").date()
+                    
+                
+        #do validation according to API, save details in DB
+            
+                    if not NewListing(Title = Title, IMDB_link = IMDB_link, Followed = int(Followed),
+                                      Poster_link = Poster_link, Creators = Creators,
+                                      Actors = Actors, FoundTorrent = int(FoundTorrent), TorrentLink1 = TorrentLink1,
+                                      Last_found_check = Last_found_check, ReleaseDate = ReleaseDate):
+                        Errors.append(IMDB_link)
+                    Movienr+=1
+            self.write("These were not entered (may be already there/ bad data parsing) = " + str(Errors))
+                
+        except:
+            self.render("AddMovie.html", error_IMDB_link = "Error with JSON parsing")
+            
+            
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
         if movie_id:
@@ -304,10 +365,12 @@ class DetailsMovie(MovieHandler):
             self.redirect("/Details/%s"%movie_name)
         
 PAGE_RE = r'((?:[\s\.\:\!\'a-zA-Z0-9_-]+/?)*)?'
-app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),
+JSON_ext = r'(?:(\.json))?'
+app = webapp2.WSGIApplication([('/AddMovie_json/?', AddMovie_json),
+                                ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
-                                ('/Homepage', HomePage),
+                                ('/Homepage%s?'% JSON_ext, HomePage),
                                 ('/Update/', Update)
                                ],
                               debug=True)
