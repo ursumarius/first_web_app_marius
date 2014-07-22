@@ -257,6 +257,11 @@ class RemoveMovie(MovieHandler):
                 self.write('<div style="font-family: verdana;">Wrong link</div>')
         else:
             self.write('<div style="font-family: verdana;">Wrong link</div>')
+            
+class Update(MovieHandler):
+    def post(self, movie_id):
+        logging.error("Update post request")
+        self.write(json.dumps({'output': "Post request received and responded"}))
         #if (FoundTorrentChange(int(movie_id), 1)):
         #    logging.error("Changed torrent")
         #else:
@@ -301,5 +306,6 @@ app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
                                 ('/Homepage', HomePage),
+                                ('/Update/?%s?' % PAGE_RE, Update)
                                ],
                               debug=True)

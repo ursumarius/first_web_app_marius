@@ -6,16 +6,17 @@
   <div class="additional_nav">
       <div class = "nav nav-pills">
         
-        <form method="post">
-          <button type="submit" class="btn btn-default">Check Torrents</button>
-        </form>
+        <span class="check_link"><a href="javascript:Update('Sample_ID');">
+          Check Torrents
+        </a></span>
         <form method="get" action="Homepage">
           <button type="submit" name="sortby" class="btn btn-default btn-xs" value="availability">By Availability</button>
           <button type="submit" name="sortby" class="btn btn-default btn-xs" value="releasedate">By Release Date</button>
         </form>
       </div>
   
-     
+   
+   
   </div>
   {% for l in listing %}
     

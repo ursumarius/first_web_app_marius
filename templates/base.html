@@ -4,6 +4,7 @@
   <link type="text/css" rel="stylesheet" href="/static/bootstrap.min.css" />
   <link type="text/css" rel="stylesheet" href="/static/main.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <title>Marius IMDB</title>
 </head>
 
@@ -30,7 +31,20 @@
   {% block content %}
   {% endblock %}
   </div>
-  
+  <script>
+    function Update(movie_id){
+        $.ajax({
+          type: "POST",
+          url: "/Update/",
+          dataType: 'json',
+          data: JSON.stringify({ "Movie_id": movie_id})
+        })
+        .done(function( data ) { // check why I use done
+            $('.check_link').append(data["output"]);
+            //prompt(data["output"]);
+        });
+    };
+  </script>
 </body>
 
 </html>
