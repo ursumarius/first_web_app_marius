@@ -184,29 +184,30 @@ class HomePage(MovieHandler):
         p = list(q)
         
         
-        self.render("front.html", listing = p)
+        self.render("front.html", listing = p, listing_length = len(p))
         
     def post(self):
         #self.write("Updating")
-        q = models.MovieListing.gql("Where Followed= :one", one=1)
-        p = list(q)
-        number_of_titles = len(p)
-        for listing in p:
-            if listing.FoundTorrent == 0:
-                update_torrent(listing.Title)
-                logging.error("One done")
-                self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
-                time.sleep(2)
-        
-        db_key = db.Key.from_path('System_tools', 5707702298738688)
-        q = db.get(db_key)
-        if q:
-            q.value = "1"
-            q.put()
-        else:
-            q=System_tools(name="Updatekeep", value="1")
-            q.put()
-        self.redirect("/Homepage")
+        #q = models.MovieListing.gql("Where Followed= :one", one=1)
+        #p = list(q)
+        #number_of_titles = len(p)
+        #for listing in p:
+        #    if listing.FoundTorrent == 0:
+        #        update_torrent(listing.Title)
+        #        
+        #        self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
+        #        time.sleep(2)
+        #
+        #q = System_tools.gql("Where name= :title", title="Updatekeep")
+        #p = list(q)
+        #if p:
+        #    p[0].value = "1"
+        #    p[0].put()
+        #else:
+        #    q=System_tools(name="Updatekeep", value="1")
+        #    q.put()
+        logging.error("Updated all")
+        self.write("done")
         
         
       
@@ -259,9 +260,10 @@ class RemoveMovie(MovieHandler):
             self.write('<div style="font-family: verdana;">Wrong link</div>')
             
 class Update(MovieHandler):
-    def post(self, movie_id):
+    def post(self):
         logging.error("Update post request")
-        self.write(json.dumps({'output': "Post request received and responded"}))
+        data = json.loads(self.request.body)
+        self.write(json.dumps({'output': "Post request received and responded", "index":data["index"]}))
         #if (FoundTorrentChange(int(movie_id), 1)):
         #    logging.error("Changed torrent")
         #else:
@@ -306,6 +308,6 @@ app = webapp2.WSGIApplication([('/AddMovie/?%s?' % PAGE_RE, AddMovie),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
                                 ('/Homepage', HomePage),
-                                ('/Update/?%s?' % PAGE_RE, Update)
+                                ('/Update/', Update)
                                ],
                               debug=True)

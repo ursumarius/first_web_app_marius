@@ -13,6 +13,7 @@
     {% if (system_tools_object) %}
     <span style="color: white;">Last global torrent check: {{system_tools_object.Last_modified.strftime("%d %b %Y")}} </span>
     {% endif %}
+    <span class= "estimation" style="color: white;"></span>
     <div class="title">
       <a href="/Homepage" class="main-title">
         Marius IMDB
@@ -32,17 +33,20 @@
   {% endblock %}
   </div>
   <script>
-    function Update(movie_id){
-        $.ajax({
-          type: "POST",
-          url: "/Update/",
-          dataType: 'json',
-          data: JSON.stringify({ "Movie_id": movie_id})
-        })
-        .done(function( data ) { // check why I use done
-            $('.check_link').append(data["output"]);
-            //prompt(data["output"]);
-        });
+    function Estimate_and_request(listing_length){
+      var estimated_sec = parseInt(listing_length) * 4;
+      $('.estimation').text(" -- Estimated update time = " + estimated_sec + "seconds");
+      $.ajax({
+        type: "POST",
+        url: "/Homepage",
+        dataType: 'json',
+        data: JSON.stringify({ "message": "please update"})
+      })
+      
+      .done(function( data ) { 
+        get("/Homepage");
+      });
+      
     };
   </script>
 </body>
