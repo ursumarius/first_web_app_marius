@@ -38,10 +38,11 @@ class MovieHandler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         
-        db_key = db.Key.from_path('System_tools', 5707702298738688)
-        q = db.get(db_key)
-        kw['system_tools_object'] = q
-        logging.error(kw)
+        q = System_tools.gql("Where name= :title", title="Updatekeep")
+        p = list(q)
+        if p:
+            kw['system_tools_object'] = p[0]
+            logging.error(kw)
         self.write(self.render_str(template, **kw))
      
  
@@ -199,8 +200,12 @@ class HomePage(MovieHandler):
         
         db_key = db.Key.from_path('System_tools', 5707702298738688)
         q = db.get(db_key)
-        q.value = "1"
-        q.put()
+        if q:
+            q.value = "1"
+            q.put()
+        else:
+            q=System_tools(name="Updatekeep", value="1")
+            q.put()
         self.redirect("/Homepage")
         
         

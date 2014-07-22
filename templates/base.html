@@ -9,7 +9,9 @@
 
 <body>
   <div class="nav">
+    {% if (system_tools_object) %}
     <span style="color: white;">Last global torrent check: {{system_tools_object.Last_modified.strftime("%d %b %Y")}} </span>
+    {% endif %}
     <div class="title">
       <a href="/Homepage" class="main-title">
         Marius IMDB
