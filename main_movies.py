@@ -141,7 +141,10 @@ def inspect_tpb(title, year, diff_proxy = None):
             index2 = t.find('">', index)
             title_found = t[index+12: index2]
             index = index + 3* 1100
-            if not (re.search( r'TS', title_found, re.M) or re.search( r'trailer', title_found, re.M|re.I)):
+            if not (re.search( r'TS', title_found, re.M)
+                    or re.search( r'trailer', title_found, re.M|re.I)
+                    or re.search( r' cam ', title_found, re.M|re.I)
+                    or re.search( r' camrip ', title_found, re.M|re.I)):
                 if hit == 1 and find_match(title_found, title, year):
                     return search_url
                 hit = 1
