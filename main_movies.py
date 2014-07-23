@@ -167,6 +167,10 @@ def update_torrent(movie_name):
     return False
 #stuff for TPB API END##################################
 
+class Blank(MovieHandler):
+    def get(self):
+        self.redirect("/Homepage")
+        
 class HomePage(MovieHandler):
     def get(self, ext):
         def Post_as_dict(q):
@@ -371,6 +375,7 @@ app = webapp2.WSGIApplication([('/AddMovie_json/?', AddMovie_json),
                                 ('/RemoveMovie/?%s?' % PAGE_RE, RemoveMovie),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
                                 ('/Homepage%s?'% JSON_ext, HomePage),
-                                ('/Update/', Update)
+                                ('/Update/', Update),
+                                ('/?', Blank)
                                ],
                               debug=True)
