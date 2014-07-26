@@ -68,22 +68,21 @@ class MovieListing(db.Model):
             return False
         
     @classmethod
-    def NewListing(cls, Title, IMDB_link, Poster_link, Followed = 1, Creators = "", Actors = "",
-                   FoundTorrent = 0, TorrentLink1 = "", Last_found_check = datetime.date.today(), ReleaseDate = None):
+    def NewListing(cls, Title, IMDB_link, Poster_link, ReleaseDate, Followed = 1, Creators = "", Actors = "",
+                   FoundTorrent = 0, TorrentLink1 = "", Last_found_check = datetime.date.today()):
         #assume all data is valid (e.g. link is link) -- how to handler errors while entering in DB?
-        try:
-            q = MovieListing.gql("Where Title= :title", title=Title)
-            p = list(q)
-            if not p:
-                q = MovieListing(Title = Title, IMDB_link = IMDB_link, Poster_link = Poster_link, Followed = Followed,
-                         Creators = Creators, Actors = Actors, FoundTorrent = FoundTorrent, 
-                         TorrentLink1 = str(TorrentLink1), Last_found_check = Last_found_check,
-                         ReleaseDate = ReleaseDate)
-                q.put() #assume successful entry if good values
-                return True
-            return False
-        except:
-            return False
+        
+        q = MovieListing.gql("Where Title= :title", title=Title)
+        p = list(q)
+        if not p:
+            q = MovieListing(Title = Title, IMDB_link = IMDB_link, Poster_link = Poster_link, Followed = Followed,
+                     Creators = Creators, Actors = Actors, FoundTorrent = FoundTorrent, 
+                     TorrentLink1 = str(TorrentLink1), Last_found_check = Last_found_check,
+                     ReleaseDate = ReleaseDate)
+            q.put() #assume successful entry if good values
+            return True
+        return False
+       
         
         
 
