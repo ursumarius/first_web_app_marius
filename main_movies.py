@@ -378,7 +378,7 @@ class DetailsMovie(MovieHandler):
             p[0].put()
             self.redirect("/Details/%s"%movie_name)
         
-PAGE_RE = r'((?:[\s\.\:\!\'a-zA-Z0-9_-]+/?)*)?'
+PAGE_RE = r'((?:[\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
 JSON_ext = r'(?:(\.json))?'
 app = webapp2.WSGIApplication([('/AddMovie_json/?', AddMovie_json),
                                 ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
