@@ -44,9 +44,21 @@ body{
 }
 
 .nav{
-    margin-bottom: 30px;
+    margin-bottom: 5px;
     
 }
+#pages_links a {
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 14px 10px;
+  text-transform: uppercase;
+}
+
+.nav li{
+    display: inline;
+}
+
 .main-title{
     color: white;
 }
@@ -55,7 +67,6 @@ body{
     color: white;
     text-align: left;
     padding-right: 20px;
-    position: absolute;
     max-width: 200px;
     
     margin-top: -30px;

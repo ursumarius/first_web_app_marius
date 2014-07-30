@@ -38,7 +38,7 @@
             {% for s in series %}
             <tr>
                 <td>Title: </td> <td><strong>{{s.Title}}</strong></td>
-                <td>Release:</td> <td>{{s.ReleaseDate}}</td>
+                <td>Release:</td> <td>{{s.ReleaseDate.strftime("%d %b %Y")}}</td>
             </tr>
             {% endfor %}
         </table>
