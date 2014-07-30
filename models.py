@@ -11,6 +11,25 @@ import datetime
 render_str = jinja_util.render_str
 valid_pw = utilities_mu.valid_pw
 make_pw_hash = utilities_mu.make_pw_hash
+
+class Series(db.Model):
+    Title = db.StringProperty(required = True)
+    ReleaseDate = db.DateProperty(required = False)
+    Created = db.DateTimeProperty(auto_now_add = True)
+    Last_modified = db.DateTimeProperty(auto_now = True)
+    @classmethod
+    def NewSeries(cls, Title, ReleaseDate):
+        if not ReleaseDate:
+            ReleaseDate = datetime.date.today()
+        q = Series.gql("Where Title= :title", title=Title)
+        p = list(q)
+        if not p:
+            q = Series(Title = Title, ReleaseDate = ReleaseDate)
+            q.put() #assume successful entry if good values
+            return True
+        return False
+    
+
 class MovieListing(db.Model):
     Title = db.StringProperty(required = True)
     IMDB_link = db.LinkProperty(required = True)

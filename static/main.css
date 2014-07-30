@@ -22,6 +22,16 @@ body{
     display: inline-block;
 }
 
+.series_table{
+    min-width: 500px;
+}
+
+.series_table table{
+    min-width: inherit;
+    margin: auto;
+    color: white;
+}
+
 .nav{
     margin-bottom: 30px;
     

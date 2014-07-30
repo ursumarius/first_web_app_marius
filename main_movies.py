@@ -13,7 +13,8 @@ import re
 import time
 from google.appengine.ext import db
 
-
+Series = models.Series
+NewSeries = models.Series.NewSeries
 NewListing = models.MovieListing.NewListing
 TorrentLink1Edit = models.MovieListing.TorrentLink1Edit
 FollowedChange = models.MovieListing.FollowedChange
@@ -343,7 +344,34 @@ class RemoveMovie(MovieHandler):
                 self.write('<div style="font-family: verdana;">Wrong link</div>')
         else:
             self.write('<div style="font-family: verdana;">Wrong link</div>')
-            
+ 
+class Series(MovieHandler):
+    def get(self):
+        q = models.Series.gql("")
+        p = list(q)
+        if not p:
+            p=[]
+        self.render("series.html", series = p, listing_length = len(p))
+        
+    def post(self):
+        Title_entered = str(self.request.get("Title"))
+        ReleaseDate = str(self.request.get("ReleaseDate"))
+        if ReleaseDate:
+            logging.error("REleasedate incoming")
+            try:
+                ReleaseDate = datetime.datetime.strptime(ReleaseDate, "%d %b %Y").date()
+                if not NewSeries(Title = Title_entered, ReleaseDate = ReleaseDate):
+                    self.render("series.html", error_series_name = "Error with DB, maybe already entered")
+                else:
+                    self.redirect("/Series")
+            except:
+                
+                self.render("series.html", error_series_name = "Invalid Date format")
+        else:
+            if not NewSeries(Title = Title_entered, ReleaseDate = ReleaseDate):
+                self.render("series.html", error_series_name = "Error with DB, maybe already entered")
+            else:
+                self.redirect("/Series") 
 class Update(MovieHandler):
     def post(self):
         logging.error("Update post request")
@@ -396,6 +424,7 @@ app = webapp2.WSGIApplication([('/AddMovie_json/?', AddMovie_json),
                                 ('/Details/?%s?' % PAGE_RE, DetailsMovie),
                                 ('/Homepage%s?'% JSON_ext, HomePage),
                                 ('/Update/', Update),
+                                ('/Series/?', Series),
                                 ('/?', Blank)
                                ],
                               debug=True)

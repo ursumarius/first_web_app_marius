@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="col-md-4">
+</div>
+<div class="col-md-4">
+    <div class= "add_series_dialogue">
+    <form method="post">
+        <table>
+          <tr>
+            <td>
+              <input class="form-control" type="text" size="35" name="Title" placeholder="Enter Title">
+            </td>
+            <td>
+              <input class="form-control" type="text" size="35" name="ReleaseDate" placeholder="dd mmm yyyy">
+            </td>
+            <td class="error">
+              {{error_series_name}}
+            </td>
+          </tr>
+          <tr>
+            <td>
+            <button type="submit" class="btn btn-default">Add</button>
+            </td>
+          </tr>
+         </table>
+        
+      </form>
+    </div>
+    <div class = "series_table">
+        <table class="table">
+            {% for s in series %}
+            <tr>
+                <td>Title: </td> <td><strong>{{s.Title}}</strong></td>
+                <td>Release:</td> <td>{{s.ReleaseDate}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<div class="col-md-4">
+</div>
+{% endblock %}
