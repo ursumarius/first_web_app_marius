@@ -231,7 +231,7 @@ class HomePage(MovieHandler):
                 self.write("Error while creating")
             self.write(json.dumps(dict_out))
         else:    
-            self.render("front.html", listing = p, listing_length = len(p))
+            self.render("front.html", listing = p, page_heading = "Homepage - Marius", listing_length = len(p))
         
     def post(self, ext):
         self.write("Updating")
@@ -264,7 +264,7 @@ class AddMovie(MovieHandler):
         #if IMDB_link:
         
         IMDB_link = str(IMDB_link)  
-        self.render("AddMovie.html", IMDB_link = IMDB_link)
+        self.render("AddMovie.html", page_heading = "Add Movie - Marius", IMDB_link = IMDB_link)
         
     def post(self, IMDB_link):
         
@@ -293,7 +293,7 @@ class AddMovie(MovieHandler):
         if not NewListing(Title = Title, IMDB_link = IMDB_link,
                           Poster_link = Poster_link, Creators = Creators,
                           Actors = Actors, ReleaseDate = ReleaseDate):
-            self.render("AddMovie.html", error_IMDB_link = "Error with DB, maybe already entered")
+            self.render("AddMovie.html", page_heading = "Add Movie - Marius", error_IMDB_link = "Error with DB, maybe already entered")
         else:
             self.redirect("/AddMovie")
         
@@ -301,7 +301,7 @@ class AddMovie(MovieHandler):
             
 class AddMovie_json(MovieHandler):
     def get(self):
-        self.render("AddMovie_json.html")
+        self.render("AddMovie_json.html", page_heading = "Add Movies JSON - Marius",)
         
     def post(self):
         JSON_entered = str(self.request.get("IMDB_link"))
@@ -362,7 +362,7 @@ class Series(MovieHandler):
         p = list(q)
         if not p:
             p=[]
-        self.render("series.html", series = p, listing_length = len(p))
+        self.render("series.html", series = p, page_heading = "Series - Marius", listing_length = len(p))
         
     def post(self):
         Title_entered = str(self.request.get("Title"))
@@ -372,15 +372,15 @@ class Series(MovieHandler):
             try:
                 ReleaseDate = datetime.datetime.strptime(ReleaseDate, "%d %b %Y").date()
                 if not NewSeries(Title = Title_entered, ReleaseDate = ReleaseDate):
-                    self.render("series.html", error_series_name = "Error with DB, maybe already entered")
+                    self.render("series.html", page_heading = "Series - Marius", error_series_name = "Error with DB, maybe already entered")
                 else:
                     self.redirect("/Series")
             except:
                 
-                self.render("series.html", error_series_name = "Invalid Date format")
+                self.render("series.html", page_heading = "Series - Marius", error_series_name = "Invalid Date format")
         else:
             if not NewSeries(Title = Title_entered, ReleaseDate = ReleaseDate):
-                self.render("series.html", error_series_name = "Error with DB, maybe already entered")
+                self.render("series.html", page_heading = "Series - Marius", error_series_name = "Error with DB, maybe already entered")
             else:
                 self.redirect("/Series") 
 class Update(MovieHandler):
@@ -407,7 +407,7 @@ class DetailsMovie(MovieHandler):
         p = list(q)
         #logging.error("p = %s"%p)
         if p:
-            self.render("Movie_listing_details.html", listing = p[0])
+            self.render("Movie_listing_details.html", page_heading = p[0].Title +" - Marius", listing = p[0])
         else:
             self.write("Title Not Found")
     def post(self, movie_name):

@@ -4,7 +4,7 @@
   <link type="text/css" rel="stylesheet" href="/static/bootstrap.min.css" />
   <link type="text/css" rel="stylesheet" href="/static/main.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Marius IMDB</title>
+  <title>{{page_heading}}</title>
 </head>
 
 <body>
@@ -12,16 +12,17 @@
     {% if (system_tools_object) %}
     <span style="color: white;">Last global torrent check: {{system_tools_object.Last_modified.strftime("%d %b %Y")}} </span>
     {% endif %}
-    <span class= "estimation" style="color: white;"></span>
+    
     <div class="title">
       <a href="/Homepage" class="main-title">
         Marius IMDB
       </a>
     </div>
     <div class="pages_movies">
-      <a href="/AddMovie">Add Movie</a></br>
-      <a href="/AddMovie_json">Add DB from JSON backup</a></br>
-      <a href="/Homepage.json">Homepage JSON</a>
+      <a href="/AddMovie">Add Movie</a>
+      <a href="/AddMovie_json">Add DB from JSON backup</a>
+      <a href="/Homepage.json">Export JSON</a>
+      <a href="/Series">Series</a>
     </div>
     
     

@@ -2,13 +2,15 @@
 
 
 {% block form %}
-  
+   <div class="sec_title">
+        Add Movies from JSON
+  </div>
   <div class= "add_movie_dialogue">
     <form method="post" action="/AddMovie_json">
         <table>
           <tr>
             <td>
-              <input class="form-control" type="text" size="55" name="IMDB_link" placeholder="Enter IMDB url">
+              <textarea  autofocus="1" rows="30" cols="110" name="IMDB_link" placeholder="Enter JSON"></textarea>
             </td>
             <td class="error">
               {{error_IMDB_link}}
