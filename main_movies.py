@@ -65,6 +65,16 @@ def create_details_url(imdb_id, title= None, year=None):
         url_open = url_open+"&y="+year
     return url_open
 
+#def title_make_valid(title):
+#    title_in = title
+#    PAGE_RE = r'((?:[\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
+#    title_out = ""
+#    for element in title_in:
+#        if not re.match( PAGE_RE,element, re.M|re.I):
+#            element = "."
+#        title_out = title_out+element
+#    return title_out
+
 def create_json_details(imdb_id, title=None, year=None):
     url_open = create_details_url(imdb_id, title= None, year=None)
     contents = urllib2.urlopen(url_open)
