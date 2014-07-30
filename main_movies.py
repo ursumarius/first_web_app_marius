@@ -26,7 +26,6 @@ signup = models.Users.signup
 login_check = models.Users.login_check
 correct_cookie = models.Users.correct_cookie
 make_json_str = utilities_mu.make_json_str
-Post_as_dict = utilities_mu.Post_as_dict
 render_str = jinja_util.render_str
 #single_post = models.single_post
 
@@ -187,7 +186,7 @@ class Blank(MovieHandler):
         
 class HomePage(MovieHandler):
     def get(self, ext):
-        def Post_as_dict(q):
+        def create_dict_Movielisting(q):
             dict_out = {"Title": str(q.Title),
                         "IMDB_link":str(q.IMDB_link),
                         "Followed": str(q.Followed),
@@ -197,6 +196,10 @@ class HomePage(MovieHandler):
                         "FoundTorrent": str(q.FoundTorrent),
                         "TorrentLink1": str(q.TorrentLink1),
                         "Last_found_check": str(q.Last_found_check.strftime("%d %b %Y")),
+                        "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
+            return dict_out
+        def create_dict_Series(q):
+            dict_out = {"Title": str(q.Title),
                         "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
             return dict_out
         
@@ -213,13 +216,20 @@ class HomePage(MovieHandler):
             order = "asc"
         q = MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
         p = list(q)
+        s = models.Series.gql("")
+        se = list(s)
         if ext:
             
             dict_out = {}
             for i in range(0,len(p),1):
-                current_entry = Post_as_dict(p[i])
+                current_entry = create_dict_Movielisting(p[i])
                 dict_out["Movie"+str(i)] = current_entry
-            self.write(json.dumps(dict_out))  
+            for i in range(0,len(se),1):
+                current_entry = create_dict_Series(se[i])
+                dict_out["Series"+str(i)] = current_entry
+            if not dict_out.get("Movie"+str(len(p)-1)):
+                self.write("Error while creating")
+            self.write(json.dumps(dict_out))
         else:    
             self.render("front.html", listing = p, listing_length = len(p))
         
@@ -299,37 +309,38 @@ class AddMovie_json(MovieHandler):
         i = 1
         Movienr = 0
         Errors = []
-        try:    
-            while i:
-                Movie_id = "Movie"+str(Movienr)
-                j = JSON_movies.get(Movie_id)#from json now
-                if not j:
-                    i = 0
-                else:
-                    Title = j["Title"]
-                    IMDB_link = j["IMDB_link"]
-                    Followed = j["Followed"]
-                    Poster_link = j["Poster_link"]
-                    Creators = j["Creators"]
-                    Actors = j["Actors"]
-                    FoundTorrent = j["FoundTorrent"]
-                    TorrentLink1 = j["TorrentLink1"]
-                    Last_found_check = datetime.datetime.strptime(j["Last_found_check"], "%d %b %Y").date()
-                    ReleaseDate = datetime.datetime.strptime(j["ReleaseDate"], "%d %b %Y").date()
-                    
-                
-        #do validation according to API, save details in DB
             
-                    if not NewListing(Title = Title, IMDB_link = IMDB_link, Followed = int(Followed),
-                                      Poster_link = Poster_link, Creators = Creators,
-                                      Actors = Actors, FoundTorrent = int(FoundTorrent), TorrentLink1 = TorrentLink1,
-                                      Last_found_check = Last_found_check, ReleaseDate = ReleaseDate):
-                        Errors.append(IMDB_link)
-                    Movienr+=1
-            self.write("These were not entered (may be already there/ bad data parsing) = " + str(Errors))
+        while i:
+            Movie_id = "Movie"+str(Movienr)
+            j = JSON_movies.get(Movie_id)#from json now
+            if not j:
+                i = 0
+            else:
+                Title = j["Title"]
+                IMDB_link = j["IMDB_link"]
+                Followed = j["Followed"]
+                Poster_link = j["Poster_link"]
+                Creators = j["Creators"]
+                Actors = j["Actors"]
+                FoundTorrent = j["FoundTorrent"]
+                TorrentLink1 = j["TorrentLink1"]
+                Last_found_check = datetime.datetime.strptime(j["Last_found_check"], "%d %b %Y").date()
+                ReleaseDate = datetime.datetime.strptime(j["ReleaseDate"], "%d %b %Y").date()
+                if TorrentLink1 == "None":
+                    TorrentLink1 = None
+                if Poster_link == "None":
+                    Poster_link = None
+            
+    #do validation according to API, save details in DB
+        
+                if not NewListing(Title = Title, IMDB_link = IMDB_link, Followed = int(Followed),
+                                  Poster_link = Poster_link, Creators = Creators,
+                                  Actors = Actors, FoundTorrent = int(FoundTorrent), TorrentLink1 = TorrentLink1,
+                                  Last_found_check = Last_found_check, ReleaseDate = ReleaseDate):
+                    Errors.append(IMDB_link)
+                Movienr+=1
+        self.write("These were not entered (may be already there/ bad data parsing) = " + str(Errors))
                 
-        except:
-            self.render("AddMovie.html", error_IMDB_link = "Error with JSON parsing")
             
             
 class RemoveMovie(MovieHandler):
