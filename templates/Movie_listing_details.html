@@ -41,13 +41,21 @@
         <tr>
         <td> Added:</td>  <td>{{listing.Created.strftime("%c")}}</td>
         </tr>
+        
+        <a href="/RemoveMovie/{{listing.key().id()}}">Stop Following</a>
+        
         <tr>
-        <td><a href="/RemoveMovie/{{listing.key().id()}}">Stop Following</a></td><td></td>
-        </tr>
-        <tr>
-        <td><form method="post">
-        <button type="submit" name="checktorrent" value="1" class="btn btn-default">Check Torrent</button>
-        <button type="submit" name="falseflag" value="1" class="btn btn-default">False Flag</button></form></td><td></td>
+        <td>
+          <form method="post">
+            <button type="submit" name="checktorrent" value="1" class="btn btn-default">Check Torrent</button>
+            <button type="submit" name="falseflag" value="1" class="btn btn-default">False Flag</button>
+          </form>
+        <form method="get" action="/RemoveMovie/{{listing.key().id()}}" style = "display:inline;">
+          <button type="submit" class="btn btn-default">Stop Following</button>
+        </form>
+        </td>
+        <td>
+        </td>
         </tr>
       </table>
     </div>
