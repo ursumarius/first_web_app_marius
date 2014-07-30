@@ -14,6 +14,14 @@ body{
     
 }
 
+.col-md-4 button{
+    margin: 5px;
+}
+
+.col-md-4 div{
+    display: inline-block;
+}
+
 .nav{
     margin-bottom: 30px;
     
