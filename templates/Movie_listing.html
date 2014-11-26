@@ -7,7 +7,7 @@
     {% endif %}
     
     <div class="movie_title">
-      <a href="/Details/{{listing.Title_escaped_url}}">{{listing.Title}}</a>
+      <a href="/Details/{{listing.key().id()}}-{{listing.Title_escaped_url}}">{{listing.Title}}</a>
     </div>
     <div class="movie_poster">
       <a href="{{listing.TorrentLink1}}"><img src="{{listing.Poster_link}}" alt="not found" class="img-responsive"></a>

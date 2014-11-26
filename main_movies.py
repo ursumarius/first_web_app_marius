@@ -401,16 +401,19 @@ class Update(MovieHandler):
 
 class DetailsMovie(MovieHandler):
     
-    def get(self, movie_name):
+    def get(self, queryparam):
         #problem with redirecting titles with space.
+        movie_name = queryparam[queryparam.find("-")+1:]
         logging.error("movie_name=<%s>'"%movie_name)
-        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-        p = list(q)
-        #logging.error("p = %s"%p)
-        if p:
-            self.render("Movie_listing_details.html", page_heading = p[0].Title +" - Marius", listing = p[0])
+        ident = queryparam[0:queryparam.find("-")]
+        logging.error("ident=<%s>'"%ident)
+        q = models.MovieListing.get_by_id(int(ident))
+        
+        if q:
+            self.render("Movie_listing_details.html", page_heading =q.Title +" - Marius", listing = q)
         else:
             self.write("Title Not Found")
+            
     def post(self, movie_name):
         post_falseflag = self.request.get("falseflag")
         post_checktorrent = self.request.get("checktorrent")
