@@ -7,6 +7,7 @@ from collections import namedtuple
 from google.appengine.ext import db
 import logging
 import datetime
+import urllib
 
 render_str = jinja_util.render_str
 valid_pw = utilities_mu.valid_pw
@@ -32,6 +33,7 @@ class Series(db.Model):
 
 class MovieListing(db.Model):
     Title = db.StringProperty(required = True)
+    Title_escaped_url = db.StringProperty(required = True)
     IMDB_link = db.LinkProperty(required = True)
     Followed = db.IntegerProperty(required = True)
     Poster_link = db.LinkProperty(required = False)
@@ -94,7 +96,7 @@ class MovieListing(db.Model):
         q = MovieListing.gql("Where Title= :title", title=Title)
         p = list(q)
         if not p:
-            q = MovieListing(Title = Title, IMDB_link = IMDB_link, Poster_link = Poster_link, Followed = Followed,
+            q = MovieListing(Title = Title, Title_escaped_url= urllib.quote(Title), IMDB_link = IMDB_link, Poster_link = Poster_link, Followed = Followed,
                      Creators = Creators, Actors = Actors, FoundTorrent = FoundTorrent, 
                      TorrentLink1 = str(TorrentLink1), Last_found_check = Last_found_check,
                      ReleaseDate = ReleaseDate)

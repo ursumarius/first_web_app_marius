@@ -13,6 +13,7 @@ import re
 import time
 from google.appengine.ext import db
 
+
 Series = models.Series
 NewSeries = models.Series.NewSeries
 NewListing = models.MovieListing.NewListing
@@ -402,7 +403,7 @@ class DetailsMovie(MovieHandler):
     
     def get(self, movie_name):
         #problem with redirecting titles with space.
-        logging.error("movie_name=~%s~'"%movie_name)
+        logging.error("movie_name=<%s>'"%movie_name)
         q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
         p = list(q)
         #logging.error("p = %s"%p)
@@ -427,7 +428,7 @@ class DetailsMovie(MovieHandler):
             p[0].put()
             self.redirect("/Details/%s"%movie_name)
         
-PAGE_RE = r'((?:[\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
+PAGE_RE = r'((?:[\?\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
 JSON_ext = r'(?:(\.json))?'
 app = webapp2.WSGIApplication([('/AddMovie_json/?', AddMovie_json),
                                 ('/AddMovie/?%s?' % PAGE_RE, AddMovie),
