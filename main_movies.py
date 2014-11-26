@@ -21,6 +21,8 @@ TorrentLink1Edit = models.MovieListing.TorrentLink1Edit
 FollowedChange = models.MovieListing.FollowedChange
 FoundTorrentChange = models.MovieListing.FoundTorrentChange
 MovieListing = models.MovieListing
+PirateProxies = models.PirateProxies
+AddProxy = models.PirateProxies.AddProxy
 System_tools = models.System_tools
 Users = models.Users
 signup = models.Users.signup
@@ -131,8 +133,9 @@ def inspect_tpb(title, year, diff_proxy = None):
             return 0
 
    
-    proxies = ["http://pirateproxy.in", "http://thebootlegbay.com", "http://thepiratebay.mg", "http://myproxypirate.com"]
+    proxies = PirateProxies.GetProxies()
     proxy_index = pick_index(title, len(proxies))
+    
     if (diff_proxy is not None) and (diff_proxy == proxy_index):
         proxy_index = (proxy_index + 1) % (len(proxies))
     
@@ -187,6 +190,7 @@ class Blank(MovieHandler):
         
 class HomePage(MovieHandler):
     def get(self, ext):
+        AddProxy("http://thepiratebay.se/")
         def create_dict_Movielisting(q):
             dict_out = {"Title": str(q.Title),
                         "IMDB_link":str(q.IMDB_link),
@@ -240,12 +244,11 @@ class HomePage(MovieHandler):
         p = list(q)
         number_of_titles = len(p)
         for listing in p:
-            if listing.FoundTorrent == 0:
+            if listing.FoundTorrent == 0:  
                 update_torrent(listing.Title)
-                
-                self.write("\nDone%s / %s"%(p.index(listing), number_of_titles))
                 time.sleep(2)
-        
+
+            
         q = System_tools.gql("Where name= :title", title="Updatekeep")
         p = list(q)
         if p:
@@ -254,7 +257,7 @@ class HomePage(MovieHandler):
         else:
             q=System_tools(name="Updatekeep", value="1")
             q.put()
-        
+        self.write("Done")
         
         
       
@@ -414,22 +417,26 @@ class DetailsMovie(MovieHandler):
         else:
             self.write("Title Not Found")
             
-    def post(self, movie_name):
+    def post(self, queryparam):
         post_falseflag = self.request.get("falseflag")
         post_checktorrent = self.request.get("checktorrent")
+        movie_name = queryparam[queryparam.find("-")+1:]
         #logging.error("falseflag=%s"%post_falseflag)
         #logging.error("checktorrent=%s"%post_checktorrent)
+        
+        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+        p = list(q)
+        logging.error("ID=%s"%p[0].key().id())
+        logging.error("NAME=%s"%movie_name)
         if post_checktorrent:
             update_torrent(movie_name) #possiblity for some nice js message popup
             time.sleep(1)
-            self.redirect("/Details/%s"%movie_name)
+            
         if post_falseflag:
-            q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-            p = list(q)
             
             p[0].FoundTorrent = 0
             p[0].put()
-            self.redirect("/Details/%s"%movie_name)
+        self.redirect("/Details/%s-%s"%(p[0].key().id(),movie_name))
         
 PAGE_RE = r'((?:[\?\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
 JSON_ext = r'(?:(\.json))?'

@@ -13,6 +13,33 @@ render_str = jinja_util.render_str
 valid_pw = utilities_mu.valid_pw
 make_pw_hash = utilities_mu.make_pw_hash
 
+class PirateProxies(db.Model):
+    Address = db.StringProperty(required = True)
+    
+    @classmethod
+    def AddProxy(cls, url):
+        q = PirateProxies.gql("Where Address= :title", title=url)
+        p = list(q)
+        if not p:
+            q = PirateProxies(Address = url)
+            q.put()
+            return True
+        return False
+    
+    
+    
+    @classmethod
+    def GetProxies(cls):
+        q = PirateProxies.gql("")
+        ql = list(q)
+        p = []
+        
+        if ql:
+            for i in range (0, len(ql), 1):
+                p.append(ql[i].Address)
+            return p
+        return None
+
 class Series(db.Model):
     Title = db.StringProperty(required = True)
     ReleaseDate = db.DateProperty(required = False)
