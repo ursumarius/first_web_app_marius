@@ -19,13 +19,15 @@ title_found2 = "Divergent 2014 TS Xvid Mp3-MiLLENiUM"
 
 
 def find_match(found, title, year):
-    titles = create_titles(title)
-    for title in titles:
-        PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
-        
-        matchObj = re.match( PAGE_RE,found, re.M)
-        if matchObj:
-           return "OK"
-        
-    return "No match!!"
+        titles = create_titles(title)
+        for title in titles:
+            PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
+            
+            matchObj = re.match( PAGE_RE,found, re.M|re.I)
+            if matchObj:
+               return True
+        return None
+
+title_found = "Expandables 3 Trailer"
+re.search( r'trailer', title_found, re.M|re.I)
 
