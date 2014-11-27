@@ -55,7 +55,6 @@ def inspect_tpb(title, year, proxies, diff_proxy = None):
     search_url = create_search_url(title, year, proxy)
     
     try:
-        logging.error("Enter access of TPB")
         t = urllib2.urlopen(search_url)
         t = t.read()
         index = 9000
@@ -77,21 +76,17 @@ def inspect_tpb(title, year, proxies, diff_proxy = None):
                     or re.search( r' camrip ', title_found, re.M|re.I)):
                 
                 if hit == 1 and find_match(title_found, title, year):
-                    logging.error("Found")
                     return search_url
                     
                 hit = 1
-        logging.error("Not Found")
         return None
         
     
     except:
-        logging.error("Enter exception of TPB")
+
         if diff_proxy:
-            logging.error("Error")
             return "Error"
         
         else:
-            logging.error("Not Found")
             return inspect_tpb(title, year, proxies, proxy_index)
 

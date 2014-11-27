@@ -53,39 +53,26 @@ class MovieHandler(webapp2.RequestHandler):
             kw['system_tools_object'] = p[0]
             
         self.write(self.render_str(template, **kw))
-     
- 
-
-#stuff for IMDB API################
-
-# stuff for IMDB API END##################################
-
-
-# stuff for TPB API##################################
-
-
-#stuff for TPB API END##################################
-
-#makes use of the TPB API, if found will modify the DB
-def update_torrent(movie_name):
-    
-    q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-    p = list(q)
-    obj_movie = p[0]
-    proxies = PirateProxies.GetProxies()
-    findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"), proxies)
-    
-    if findings != "Error":
+    #makes use of the TPB API, if found will modify the DB
+    def update_torrent(movie_name):
         
-        truth = 0
-        if findings:
-            truth = 1
+        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+        p = list(q)
+        obj_movie = p[0]
+        proxies = PirateProxies.GetProxies()
+        findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"), proxies)
+        
+        if findings != "Error":
             
-        FoundTorrentChange(movie_name, findings, truth)
-        
-        return True
-    
-    return False
+            truth = 0
+            if findings:
+                truth = 1
+                
+            FoundTorrentChange(movie_name, findings, truth)
+            
+            return True
+        return False
+
 
 #if path is empty, will redirect to homepage
 class Blank(MovieHandler):
