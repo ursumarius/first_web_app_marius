@@ -32,6 +32,7 @@ make_json_str = utilities_mu.make_json_str
 render_str = jinja_util.render_str
 #single_post = models.single_post
 
+#basic function used for all child handlers
 class MovieHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -41,16 +42,17 @@ class MovieHandler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         
+        #in order to know when the last update was done, and display it
         q = System_tools.gql("Where name= :title", title="Updatekeep")
         p = list(q)
         if p:
             kw['system_tools_object'] = p[0]
             logging.error(kw)
+            
         self.write(self.render_str(template, **kw))
      
  
-#stuff for IMDB API################
-
+ #used for creating escaped url's, escapes <space> use in IMDB and TPB
 def escape_urlobj(title):
     title = str(title)
     for i in range(len(title)):
@@ -58,7 +60,12 @@ def escape_urlobj(title):
             print i
             title=title[:i]+"%20"+title[i+1:]
     return title
+ 
+#stuff for IMDB API################
 
+
+
+#prepare query url for IMDB API
 def create_details_url(imdb_id, title= None, year=None):
     url_open = "http://www.omdbapi.com/?i="+imdb_id
     if title:
@@ -68,16 +75,7 @@ def create_details_url(imdb_id, title= None, year=None):
         url_open = url_open+"&y="+year
     return url_open
 
-#def title_make_valid(title):
-#    title_in = title
-#    PAGE_RE = r'((?:[\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
-#    title_out = ""
-#    for element in title_in:
-#        if not re.match( PAGE_RE,element, re.M|re.I):
-#            element = "."
-#        title_out = title_out+element
-#    return title_out
-
+#outputs json file with details on movie based on an IMDB id
 def create_json_details(imdb_id, title=None, year=None):
     url_open = create_details_url(imdb_id, title= None, year=None)
     contents = urllib2.urlopen(url_open)
@@ -85,9 +83,14 @@ def create_json_details(imdb_id, title=None, year=None):
     return json.loads(contents_str)
 
 # stuff for IMDB API END##################################
+
+
 # stuff for TPB API##################################
 
+
 def inspect_tpb(title, year, diff_proxy = None):
+    
+    #creates the title using "." instead of space. returns normal and with "."
     def create_titles(title):
         title = str(title)
         title_p = title
@@ -97,35 +100,23 @@ def inspect_tpb(title, year, diff_proxy = None):
                 title_p=title_p[:i]+"."+title_p[i+1:]
         return [title, title_p]
     
+    #matches the title+year based on the findings, returns True if found
     def find_match(found, title, year):
         titles = create_titles(title)
         for title in titles:
             PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
-            
             matchObj = re.match( PAGE_RE,found, re.M|re.I)
             if matchObj:
                return True
         return None
     
-    def escape_urlobj(title):
-        title = str(title)
-        for i in range(len(title)):
-            if title[i]==' ' and len(title)>1 and i<len(title):
-                print i
-                title=title[:i]+"%20"+title[i+1:]
-        return title
-    
-    def compute_length_match(title):
-        count = 0
-        for element in title:
-            if element == " ":
-                count+=1
-        return count+len(title)+6
+    #outputs the search_url according to the movie details and proxy
     def create_search_url(title, year, proxy):
         title = str(title)
         search = escape_urlobj(title+" "+year)
         return proxy+search+"/0/99/200"
     
+    #simulates a probably evenly distributed spread of hits among the proxies, returns the index of proxy to be queried
     def pick_index(title, length_proxies):
         if len(title)>4:
             return (ord(title[-1]) + ord(title[-2]) + ord(title[-3]))%length_proxies
@@ -146,7 +137,6 @@ def inspect_tpb(title, year, diff_proxy = None):
         t = urllib2.urlopen(search_url)
         t = t.read()
         index = 9000
-        m = compute_length_match(title)
         hit = 0
         for i in range(3):
             index = t.find("Details for",index)
@@ -169,21 +159,32 @@ def inspect_tpb(title, year, diff_proxy = None):
         else:
             return inspect_tpb(title, year, proxy_index)
 
+
+
+#stuff for TPB API END##################################
+
+#makes use of the TPB API, if found will modify the DB
 def update_torrent(movie_name):
     
     q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
     p = list(q)
     obj_movie = p[0]
     findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"))
+    
     if findings != "Error":
+        
         truth = 0
         if findings:
+            
             truth = 1
+            
         FoundTorrentChange(movie_name, findings, truth)
+        
         return True
+    
     return False
-#stuff for TPB API END##################################
 
+#if path is empty, will redirect to homepage
 class Blank(MovieHandler):
     def get(self):
         self.redirect("/Homepage")
@@ -191,6 +192,8 @@ class Blank(MovieHandler):
 class HomePage(MovieHandler):
     def get(self, ext):
         AddProxy("http://thepiratebay.se/")
+        
+        
         def create_dict_Movielisting(q):
             dict_out = {"Title": str(q.Title),
                         "IMDB_link":str(q.IMDB_link),
