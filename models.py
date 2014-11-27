@@ -91,14 +91,14 @@ class MovieListing(db.Model):
             return False
         
     @classmethod
-    def FoundTorrentChange(cls, title, url, truth):
-        q = MovieListing.gql("Where Title= :title", title=title)
-        p = list(q)
-        if p[0]:
-            p[0].FoundTorrent = truth
-            p[0].TorrentLink1 = url
-            p[0].Last_found_check = datetime.date.today()
-            p[0].put()
+    def FoundTorrentChange(cls, movie_id, url, truth):
+        movie_listing_object = MovieListing.get_by_id(int(movie_id))
+ 
+        if movie_listing_object:
+            movie_listing_object.FoundTorrent = truth
+            movie_listing_object.TorrentLink1 = url
+            movie_listing_object.Last_found_check = datetime.date.today()
+            movie_listing_object.put()
             #logging.error("Followed in db = %s"%str(q.Followed))
             return True
         else:

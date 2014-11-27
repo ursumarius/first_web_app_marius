@@ -54,11 +54,9 @@ class MovieHandler(webapp2.RequestHandler):
             
         self.write(self.render_str(template, **kw))
     #makes use of the TPB API, if found will modify the DB
-    def update_torrent(movie_name):
+    def update_torrent(self, movie_id):
         
-        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-        p = list(q)
-        obj_movie = p[0]
+        obj_movie = models.MovieListing.get_by_id(int(movie_id))       
         proxies = PirateProxies.GetProxies()
         findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"), proxies)
         
@@ -68,7 +66,7 @@ class MovieHandler(webapp2.RequestHandler):
             if findings:
                 truth = 1
                 
-            FoundTorrentChange(movie_name, findings, truth)
+            FoundTorrentChange(movie_id, findings, truth)
             
             return True
         return False
@@ -153,7 +151,7 @@ class HomePage(MovieHandler):
         for listing in p:
             
             if listing.FoundTorrent == 0:  
-                update_torrent(listing.Title)
+                update_torrent(listing.key().id())
                 time.sleep(2)
 
         last_check_cursor = System_tools.gql("Where name= :title", title="Updatekeep")
@@ -345,19 +343,18 @@ class DetailsMovie(MovieHandler):
         #logging.error("falseflag=%s"%post_falseflag)
         #logging.error("checktorrent=%s"%post_checktorrent)
         
-        movie_cursor = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-        movie_listing_list = list(movie_cursor)
-        logging.error("ID=%s"%movie_listing_list[0].key().id())
-        logging.error("NAME=%s"%movie_name)
+        movie_id = self.request.path[9:25]
+        movie_listing_obj = models.MovieListing.get_by_id(int(movie_id))
+        
         if post_checktorrent:
-            update_torrent(movie_name) #possiblity for some nice js message popup
+            self.update_torrent(movie_id) #possiblity for some nice js message popup
             time.sleep(1)
             
         if post_falseflag:
             
-            movie_listing_list[0].FoundTorrent = 0
-            movie_listing_list[0].put()
-        self.redirect("/Details/%s-%s"%(movie_listing_list[0].key().id(),movie_name))
+            movie_listing_obj.FoundTorrent = 0
+            movie_listing_obj.put()
+        self.redirect("/Details/%s-%s"%(int(movie_id) ,movie_name))
         
 PAGE_RE = r'((?:[\?\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
 JSON_ext = r'(?:(\.json))?'
