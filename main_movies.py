@@ -134,28 +134,40 @@ def inspect_tpb(title, year, diff_proxy = None):
     proxy_search = proxy+"/search/"
     search_url = create_search_url(title, year, proxy_search)
     try:
+        
         t = urllib2.urlopen(search_url)
         t = t.read()
         index = 9000
         hit = 0
+        
         for i in range(3):
+            
             index = t.find("Details for",index)
             if index == -1:
                 return None
             index2 = t.find('">', index)
             title_found = t[index+12: index2]
             index = index + 3* 1100
+            
             if not (re.search( r'TS', title_found, re.M)
                     or re.search( r'trailer', title_found, re.M|re.I)
                     or re.search( r' cam ', title_found, re.M|re.I)
                     or re.search( r' camrip ', title_found, re.M|re.I)):
+                
                 if hit == 1 and find_match(title_found, title, year):
+                    
                     return search_url
+                
                 hit = 1
+                
         return None
+    
     except:
+        
         if diff_proxy is not None:
+            
             return "Error"
+        
         else:
             return inspect_tpb(title, year, proxy_index)
 
@@ -189,12 +201,16 @@ class Blank(MovieHandler):
     def get(self):
         self.redirect("/Homepage")
         
+#Homepage handler
 class HomePage(MovieHandler):
     def get(self, ext):
-        AddProxy("http://thepiratebay.se/")
         
-        
+        AddProxy("http://thepiratebay.se/") #just add, initialize the table so then can add by developer console
+                
+                
+        #creates a dictionary containing data of the movie_listing, used for Json
         def create_dict_Movielisting(q):
+            
             dict_out = {"Title": str(q.Title),
                         "IMDB_link":str(q.IMDB_link),
                         "Followed": str(q.Followed),
@@ -205,46 +221,61 @@ class HomePage(MovieHandler):
                         "TorrentLink1": str(q.TorrentLink1),
                         "Last_found_check": str(q.Last_found_check.strftime("%d %b %Y")),
                         "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
-            return dict_out
-        def create_dict_Series(q):
-            dict_out = {"Title": str(q.Title),
-                        "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
+            
             return dict_out
         
-        logging.error(ext)
+        #creates a dictionary for the series , used for Json
+        def create_dict_Series(q):
+            
+            dict_out = {"Title": str(q.Title), "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
+            return dict_out
+        
         sort_by = self.request.get("sortby")
-        logging.error("received sorting by %s"%sort_by)
         sorting_column = "FoundTorrent"
         order = "desc"
+        
         if (sort_by == "availability"):
+            
             sorting_column = "FoundTorrent"
             order =  "desc"
+            
         if (sort_by == "releasedate"):
+            
             sorting_column = "ReleaseDate"   
             order = "asc"
-        q = MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
-        p = list(q)
-        s = models.Series.gql("")
-        se = list(s)
+            
+        movie_cursor = MovieListing.gql("Where Followed= 1 Order by %s %s"%(sorting_column,order))
+        movie_listing_list= list(movie_cursor)
+        series_cursor = models.Series.gql("")
+        series_list = list(series_cursor)
+        
         if ext:
             
             dict_out = {}
             for i in range(0,len(p),1):
-                current_entry = create_dict_Movielisting(p[i])
+                
+                current_entry = create_dict_Movielisting(movie_listing_list[i])
                 dict_out["Movie"+str(i)] = current_entry
-            for i in range(0,len(se),1):
-                current_entry = create_dict_Series(se[i])
+                
+            for i in range(0,len(series_list),1):
+                
+                current_entry = create_dict_Series(series_list[i])
                 dict_out["Series"+str(i)] = current_entry
-            if not dict_out.get("Movie"+str(len(p)-1)):
+                
+            if not dict_out.get("Movie"+str(len(movie_listing_list)-1)):
+                
                 self.write("Error while creating")
+                
             self.write(json.dumps(dict_out))
-        else:    
-            self.render("front.html", listing = p, page_heading = "Homepage - Marius", listing_length = len(p))
+            
+        else:
+            
+            self.render("front.html", listing = movie_listing_list, page_heading = "Homepage - Marius", listing_length = len(movie_listing_list))
         
     def post(self, ext):
         self.write("Updating")
-        q = models.MovieListing.gql("Where Followed= :one", one=1)
-        p = list(q)
+        movie_cursor = models.MovieListing.gql("Where Followed= :one", one=1)
+        p = list(movie_cursor)
         number_of_titles = len(p)
         for listing in p:
             if listing.FoundTorrent == 0:  
