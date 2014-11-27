@@ -113,8 +113,8 @@ def inspect_tpb(title, year, diff_proxy = None):
     #outputs the search_url according to the movie details and proxy
     def create_search_url(title, year, proxy):
         title = str(title)
-        search = escape_urlobj(title+" "+year)
-        return proxy+search+"/0/99/200"
+        search_term = escape_urlobj(title+" "+year)
+        return proxy+"/search/"+search_term+"/0/99/200"
     
     #simulates a probably evenly distributed spread of hits among the proxies, returns the index of proxy to be queried
     def pick_index(title, length_proxies):
@@ -131,8 +131,7 @@ def inspect_tpb(title, year, diff_proxy = None):
         proxy_index = (proxy_index + 1) % (len(proxies))
     
     proxy = proxies[proxy_index]
-    proxy_search = proxy+"/search/"
-    search_url = create_search_url(title, year, proxy_search)
+    search_url = create_search_url(title, year, proxy)
     
     try:
         
