@@ -61,4 +61,12 @@ def valid_pw(pw, h):
         return True
     return False
 
-
+ #used for creating escaped url's, escapes <space> use in IMDB and TPB
+def escape_urlobj(title):
+    title = str(title)
+    for i in range(len(title)):
+        if title[i]==' ' and len(title)>1 and i<len(title):
+            print i
+            title=title[:i]+"%20"+title[i+1:]
+    return title
+ 

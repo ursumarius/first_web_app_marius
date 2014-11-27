@@ -15,6 +15,8 @@ import re
 import time
 from google.appengine.ext import db
 
+
+inspect_tpb = TPB_API.inspect_tpb
 create_json_details = IMDB_API.create_json_details
 Series = models.Series
 NewSeries = models.Series.NewSeries
@@ -49,108 +51,17 @@ class MovieHandler(webapp2.RequestHandler):
         p = list(q)
         if p:
             kw['system_tools_object'] = p[0]
-            logging.error(kw)
             
         self.write(self.render_str(template, **kw))
      
  
- #used for creating escaped url's, escapes <space> use in IMDB and TPB
-def escape_urlobj(title):
-    title = str(title)
-    for i in range(len(title)):
-        if title[i]==' ' and len(title)>1 and i<len(title):
-            print i
-            title=title[:i]+"%20"+title[i+1:]
-    return title
- 
+
 #stuff for IMDB API################
 
 # stuff for IMDB API END##################################
 
 
 # stuff for TPB API##################################
-
-
-def inspect_tpb(title, year, diff_proxy = None):
-    
-    #creates the title using "." instead of space. returns normal and with "."
-    def create_titles(title):
-        title = str(title)
-        title_p = title
-        for i in range(len(title)):
-            if title[i]==' ' and len(title)>1 and i<len(title):
-                print i
-                title_p=title_p[:i]+"."+title_p[i+1:]
-        return [title, title_p]
-    
-    #matches the title+year based on the findings, returns True if found
-    def find_match(found, title, year):
-        titles = create_titles(title)
-        for title in titles:
-            PAGE_RE = r'(?:'+title+r'( |.)?(\(|\[)?'+year+r'(\)|\])?)' 
-            matchObj = re.match( PAGE_RE,found, re.M|re.I)
-            if matchObj:
-               return True
-        return None
-    
-    #outputs the search_url according to the movie details and proxy
-    def create_search_url(title, year, proxy):
-        title = str(title)
-        search_term = escape_urlobj(title+" "+year)
-        return proxy+"/search/"+search_term+"/0/99/200"
-    
-    #simulates a probably evenly distributed spread of hits among the proxies, returns the index of proxy to be queried
-    def pick_index(title, length_proxies):
-        if len(title)>4:
-            return (ord(title[-1]) + ord(title[-2]) + ord(title[-3]))%length_proxies
-        else:
-            return 0
-
-   
-    proxies = PirateProxies.GetProxies()
-    proxy_index = pick_index(title, len(proxies))
-    
-    if (diff_proxy is not None) and (diff_proxy == proxy_index):
-        proxy_index = (proxy_index + 1) % (len(proxies))
-    
-    proxy = proxies[proxy_index]
-    search_url = create_search_url(title, year, proxy)
-    
-    try:
-        
-        t = urllib2.urlopen(search_url)
-        t = t.read()
-        index = 9000
-        hit = 0
-        
-        for i in range(3):
-            index = t.find("Details for",index)
-            
-            if index == -1:
-                return None
-            
-            index2 = t.find('">', index)
-            title_found = t[index+12: index2]
-            index = index + 3* 1100
-            
-            if not (re.search( r'TS', title_found, re.M)
-                    or re.search( r'trailer', title_found, re.M|re.I)
-                    or re.search( r' cam ', title_found, re.M|re.I)
-                    or re.search( r' camrip ', title_found, re.M|re.I)):
-                
-                if hit == 1 and find_match(title_found, title, year):
-                    return search_url
-                hit = 1
-        return None
-    
-    except:
-        
-        if diff_proxy is not None:
-            return "Error"
-        
-        else:
-            return inspect_tpb(title, year, proxy_index)
-
 
 
 #stuff for TPB API END##################################
@@ -161,7 +72,8 @@ def update_torrent(movie_name):
     q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
     p = list(q)
     obj_movie = p[0]
-    findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"))
+    proxies = PirateProxies.GetProxies()
+    findings = inspect_tpb(obj_movie.Title, obj_movie.ReleaseDate.strftime("%Y"), proxies)
     
     if findings != "Error":
         
