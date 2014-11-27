@@ -379,7 +379,8 @@ class AddMovie_json(MovieHandler):
         else:
             self.write("Success")
             
-            
+
+#handles "stop following" button
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
         if movie_id:
@@ -393,6 +394,7 @@ class RemoveMovie(MovieHandler):
         else:
             self.write('<div style="font-family: verdana;">Wrong link</div>')
  
+#displays Series
 class Series(MovieHandler):
     def get(self):
         q = models.Series.gql("")
@@ -419,7 +421,10 @@ class Series(MovieHandler):
             if not NewSeries(Title = Title_entered, ReleaseDate = ReleaseDate):
                 self.render("series.html", page_heading = "Series - Marius", error_series_name = "Error with DB, maybe already entered")
             else:
-                self.redirect("/Series") 
+                self.redirect("/Series")
+                
+
+#this was left after experimenting with JS
 class Update(MovieHandler):
     def post(self):
         logging.error("Update post request")
@@ -435,6 +440,7 @@ class Update(MovieHandler):
         #else:
         #    logging.error("Couldnt change torrentlink")
 
+#details per every movie
 class DetailsMovie(MovieHandler):
     
     def get(self, queryparam):
@@ -443,10 +449,10 @@ class DetailsMovie(MovieHandler):
         logging.error("movie_name=<%s>'"%movie_name)
         ident = queryparam[0:queryparam.find("-")]
         logging.error("ident=<%s>'"%ident)
-        q = models.MovieListing.get_by_id(int(ident))
+        movie_listing_obj = models.MovieListing.get_by_id(int(ident))
         
-        if q:
-            self.render("Movie_listing_details.html", page_heading =q.Title +" - Marius", listing = q)
+        if movie_listing_obj:
+            self.render("Movie_listing_details.html", page_heading =movie_listing_obj.Title +" - Marius", listing = movie_listing_obj)
         else:
             self.write("Title Not Found")
             
@@ -457,9 +463,9 @@ class DetailsMovie(MovieHandler):
         #logging.error("falseflag=%s"%post_falseflag)
         #logging.error("checktorrent=%s"%post_checktorrent)
         
-        q = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
-        p = list(q)
-        logging.error("ID=%s"%p[0].key().id())
+        movie_cursor = models.MovieListing.gql("Where Title= :title", title=str(movie_name))
+        movie_listing_list = list(movie_cursor)
+        logging.error("ID=%s"%movie_listing_list[0].key().id())
         logging.error("NAME=%s"%movie_name)
         if post_checktorrent:
             update_torrent(movie_name) #possiblity for some nice js message popup
@@ -467,9 +473,9 @@ class DetailsMovie(MovieHandler):
             
         if post_falseflag:
             
-            p[0].FoundTorrent = 0
-            p[0].put()
-        self.redirect("/Details/%s-%s"%(p[0].key().id(),movie_name))
+            movie_listing_list[0].FoundTorrent = 0
+            movie_listing_list[0].put()
+        self.redirect("/Details/%s-%s"%(movie_listing_list[0].key().id(),movie_name))
         
 PAGE_RE = r'((?:[\?\s\.\:\!\'\&a-zA-Z0-9_-]+/?)*)?'
 JSON_ext = r'(?:(\.json))?'
