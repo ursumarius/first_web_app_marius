@@ -304,31 +304,34 @@ class AddMovie(MovieHandler):
         id_index = IMDB_entered.find("title/")+6
         imdb_id= IMDB_entered[id_index:id_index+9]
            
-        j = create_json_details(imdb_id)
+        imdb_json = create_json_details(imdb_id)
+        
+        if imdb_json["Response"] == "True":
             
-        Title = j["Title"]
-        IMDB_link = "http://www.imdb.com/title/"+j["imdbID"]
-        Poster_link = j["Poster"]
-        if Poster_link == "N/A":
-            Poster_link = None 
-        Creators = j["Director"]+", "+j["Writer"]
-        Actors = j["Actors"]
-        if j["Released"] == "N/A":
-            ReleaseDate = datetime.date.today() 
-        else:
-            ReleaseDate = datetime.datetime.strptime(j["Released"], "%d %b %Y").date()
-        
+            Title = imdb_json["Title"]
+            IMDB_link = "http://www.imdb.com/title/"+imdb_json["imdbID"]
+            Poster_link = imdb_json["Poster"]
+            if Poster_link == "N/A":
+                Poster_link = None 
+            Creators = imdb_json["Director"]+", "+imdb_json["Writer"]
+            Actors = imdb_json["Actors"]
+            if imdb_json["Released"] == "N/A":
+                ReleaseDate = datetime.date.today() 
+            else:
+                ReleaseDate = datetime.datetime.strptime(imdb_json["Released"], "%d %b %Y").date()
             
-    #do validation according to API, save details in DB
+                
+            #do validation according to API, save details in DB
+            if not NewListing(Title = Title, IMDB_link = IMDB_link,
+                              Poster_link = Poster_link, Creators = Creators,
+                              Actors = Actors, ReleaseDate = ReleaseDate):
+                self.render("AddMovie.html", page_heading = "Add Movie - Marius", error_IMDB_link = "Error with DB, maybe already entered")
+            else:
+                self.redirect("/AddMovie")
         
-        if not NewListing(Title = Title, IMDB_link = IMDB_link,
-                          Poster_link = Poster_link, Creators = Creators,
-                          Actors = Actors, ReleaseDate = ReleaseDate):
-            self.render("AddMovie.html", page_heading = "Add Movie - Marius", error_IMDB_link = "Error with DB, maybe already entered")
         else:
-            self.redirect("/AddMovie")
-        
-            #self.render("AddMovie.html", error_IMDB_link = "Error with IMDB API")
+            self.render("AddMovie.html", page_heading = "Add Movie - Marius", error_IMDB_link = "Invalid ID")
+            
             
 class AddMovie_json(MovieHandler):
     def get(self):
