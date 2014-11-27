@@ -133,6 +133,7 @@ def inspect_tpb(title, year, diff_proxy = None):
     proxy = proxies[proxy_index]
     proxy_search = proxy+"/search/"
     search_url = create_search_url(title, year, proxy_search)
+    
     try:
         
         t = urllib2.urlopen(search_url)
@@ -141,10 +142,11 @@ def inspect_tpb(title, year, diff_proxy = None):
         hit = 0
         
         for i in range(3):
-            
             index = t.find("Details for",index)
+            
             if index == -1:
                 return None
+            
             index2 = t.find('">', index)
             title_found = t[index+12: index2]
             index = index + 3* 1100
@@ -155,7 +157,6 @@ def inspect_tpb(title, year, diff_proxy = None):
                     or re.search( r' camrip ', title_found, re.M|re.I)):
                 
                 if hit == 1 and find_match(title_found, title, year):
-                    
                     return search_url
                 
                 hit = 1
@@ -165,7 +166,6 @@ def inspect_tpb(title, year, diff_proxy = None):
     except:
         
         if diff_proxy is not None:
-            
             return "Error"
         
         else:
@@ -187,7 +187,6 @@ def update_torrent(movie_name):
         
         truth = 0
         if findings:
-            
             truth = 1
             
         FoundTorrentChange(movie_name, findings, truth)
@@ -207,40 +206,36 @@ class HomePage(MovieHandler):
         
         AddProxy("http://thepiratebay.se/") #just add, initialize the table so then can add by developer console
                 
-                
         #creates a dictionary containing data of the movie_listing, used for Json
-        def create_dict_Movielisting(q):
-            
-            dict_out = {"Title": str(q.Title),
-                        "IMDB_link":str(q.IMDB_link),
-                        "Followed": str(q.Followed),
-                        "Poster_link": str(q.Poster_link),
-                        "Creators": q.Creators,
-                        "Actors": (q.Actors),
-                        "FoundTorrent": str(q.FoundTorrent),
-                        "TorrentLink1": str(q.TorrentLink1),
-                        "Last_found_check": str(q.Last_found_check.strftime("%d %b %Y")),
-                        "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
+        def create_dict_Movielisting(movie_listing_obj):
+            dict_out = {"Title": str(movie_listing_obj.Title),
+                        "IMDB_link":str(movie_listing_obj.IMDB_link),
+                        "Followed": str(movie_listing_obj.Followed),
+                        "Poster_link": str(movie_listing_obj.Poster_link),
+                        "Creators": movie_listing_obj.Creators,
+                        "Actors": (movie_listing_obj.Actors),
+                        "FoundTorrent": str(movie_listing_obj.FoundTorrent),
+                        "TorrentLink1": str(movie_listing_obj.TorrentLink1),
+                        "Last_found_check": str(movie_listing_obj.Last_found_check.strftime("%d %b %Y")),
+                        "ReleaseDate": str(movie_listing_obj.ReleaseDate.strftime("%d %b %Y"))}
             
             return dict_out
         
         #creates a dictionary for the series , used for Json
-        def create_dict_Series(q):
-            
-            dict_out = {"Title": str(q.Title), "ReleaseDate": str(q.ReleaseDate.strftime("%d %b %Y"))}
+        def create_dict_Series(series_listing_obj):
+            dict_out = {"Title": str(series_listing_obj.Title), "ReleaseDate": str(series_listing_obj.ReleaseDate.strftime("%d %b %Y"))}
             return dict_out
         
+        #deciding sorting
         sort_by = self.request.get("sortby")
         sorting_column = "FoundTorrent"
         order = "desc"
         
         if (sort_by == "availability"):
-            
             sorting_column = "FoundTorrent"
             order =  "desc"
             
         if (sort_by == "releasedate"):
-            
             sorting_column = "ReleaseDate"   
             order = "asc"
             
@@ -249,59 +244,58 @@ class HomePage(MovieHandler):
         series_cursor = models.Series.gql("")
         series_list = list(series_cursor)
         
+        #JSON creation, movielisting, series
         if ext:
-            
             dict_out = {}
-            for i in range(0,len(p),1):
-                
+            
+            for i in range(0,len(movie_listing_list),1):
                 current_entry = create_dict_Movielisting(movie_listing_list[i])
                 dict_out["Movie"+str(i)] = current_entry
                 
             for i in range(0,len(series_list),1):
-                
                 current_entry = create_dict_Series(series_list[i])
                 dict_out["Series"+str(i)] = current_entry
                 
             if not dict_out.get("Movie"+str(len(movie_listing_list)-1)):
-                
                 self.write("Error while creating")
                 
             self.write(json.dumps(dict_out))
             
         else:
-            
             self.render("front.html", listing = movie_listing_list, page_heading = "Homepage - Marius", listing_length = len(movie_listing_list))
         
+    #the post is exclusively for checking torrents availability
     def post(self, ext):
-        self.write("Updating")
+        
         movie_cursor = models.MovieListing.gql("Where Followed= :one", one=1)
         p = list(movie_cursor)
         number_of_titles = len(p)
+        
         for listing in p:
+            
             if listing.FoundTorrent == 0:  
                 update_torrent(listing.Title)
                 time.sleep(2)
 
+        last_check_cursor = System_tools.gql("Where name= :title", title="Updatekeep")
+        last_check_obj_list = list(last_check_cursor)
+        
+        if last_check_obj_list:
+            last_check_obj_list[0].value = "1"
+            last_check_obj_list[0].put()
             
-        q = System_tools.gql("Where name= :title", title="Updatekeep")
-        p = list(q)
-        if p:
-            p[0].value = "1"
-            p[0].put()
         else:
-            q=System_tools(name="Updatekeep", value="1")
-            q.put()
+            last_check_cursor=System_tools(name="Updatekeep", value="1")
+            last_check_cursor.put()
+            
         self.write("Done")
         
         
-      
+#dialog for adding movies
 class AddMovie(MovieHandler):
     def get(self, IMDB_link):
-        #check if valid immediately as in post
-        #check if already exists by title and imdblink
-        #if IMDB_link:
         
-        IMDB_link = str(IMDB_link)  
+        IMDB_link = str(IMDB_link)  #support for immediate addition from url path
         self.render("AddMovie.html", page_heading = "Add Movie - Marius", IMDB_link = IMDB_link)
         
     def post(self, IMDB_link):
@@ -309,10 +303,9 @@ class AddMovie(MovieHandler):
         IMDB_entered = str(self.request.get("IMDB_link"))
         id_index = IMDB_entered.find("title/")+6
         imdb_id= IMDB_entered[id_index:id_index+9]
-        #logging.error("id=%s"%imdb_id)
-        #exception handling here, what if not found?
-        
+           
         j = create_json_details(imdb_id)
+            
         Title = j["Title"]
         IMDB_link = "http://www.imdb.com/title/"+j["imdbID"]
         Poster_link = j["Poster"]
