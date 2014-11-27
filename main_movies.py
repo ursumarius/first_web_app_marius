@@ -9,11 +9,13 @@ from google.appengine.api import memcache
 import logging
 import utilities_mu
 import models
+import TPB_API
+import IMDB_API
 import re
 import time
 from google.appengine.ext import db
 
-
+create_json_details = IMDB_API.create_json_details
 Series = models.Series
 NewSeries = models.Series.NewSeries
 NewListing = models.MovieListing.NewListing
@@ -62,25 +64,6 @@ def escape_urlobj(title):
     return title
  
 #stuff for IMDB API################
-
-
-
-#prepare query url for IMDB API
-def create_details_url(imdb_id, title= None, year=None):
-    url_open = "http://www.omdbapi.com/?i="+imdb_id
-    if title:
-        title=escape_urlobj(title)
-        url_open = url_open+"&t="+title
-    if year:
-        url_open = url_open+"&y="+year
-    return url_open
-
-#outputs json file with details on movie based on an IMDB id
-def create_json_details(imdb_id, title=None, year=None):
-    url_open = create_details_url(imdb_id, title= None, year=None)
-    contents = urllib2.urlopen(url_open)
-    contents_str = contents.read()
-    return json.loads(contents_str)
 
 # stuff for IMDB API END##################################
 
@@ -157,9 +140,7 @@ def inspect_tpb(title, year, diff_proxy = None):
                 
                 if hit == 1 and find_match(title_found, title, year):
                     return search_url
-                
                 hit = 1
-                
         return None
     
     except:
@@ -345,20 +326,20 @@ class AddMovie_json(MovieHandler):
             
         while i:
             Movie_id = "Movie"+str(Movienr)
-            j = JSON_movies.get(Movie_id)#from json now
-            if not j:
+            imdb_json = JSON_movies.get(Movie_id)#from json now
+            if not imdb_json:
                 i = 0
             else:
-                Title = j["Title"]
-                IMDB_link = j["IMDB_link"]
-                Followed = j["Followed"]
-                Poster_link = j["Poster_link"]
-                Creators = j["Creators"]
-                Actors = j["Actors"]
-                FoundTorrent = j["FoundTorrent"]
-                TorrentLink1 = j["TorrentLink1"]
-                Last_found_check = datetime.datetime.strptime(j["Last_found_check"], "%d %b %Y").date()
-                ReleaseDate = datetime.datetime.strptime(j["ReleaseDate"], "%d %b %Y").date()
+                Title = imdb_json["Title"]
+                IMDB_link = imdb_json["IMDB_link"]
+                Followed = imdb_json["Followed"]
+                Poster_link = imdb_json["Poster_link"]
+                Creators = imdb_json["Creators"]
+                Actors = imdb_json["Actors"]
+                FoundTorrent = imdb_json["FoundTorrent"]
+                TorrentLink1 = imdb_json["TorrentLink1"]
+                Last_found_check = datetime.datetime.strptime(imdb_json["Last_found_check"], "%d %b %Y").date()
+                ReleaseDate = datetime.datetime.strptime(imdb_json["ReleaseDate"], "%d %b %Y").date()
                 if TorrentLink1 == "None":
                     TorrentLink1 = None
                 if Poster_link == "None":
@@ -382,31 +363,34 @@ class AddMovie_json(MovieHandler):
 #handles "stop following" button
 class RemoveMovie(MovieHandler):
     def get(self, movie_id):
+        
         if movie_id:
+            
             if (FollowedChange(int(movie_id), 0)):
-                logging.error("Changed")
                 time.sleep(0.5) #needed for nice db time lag, possibly with cache not needed.
                 self.redirect("/Homepage")
+                
             else:
-                logging.error("Couldnt change")
                 self.write('<div style="font-family: verdana;">Wrong link</div>')
+        
         else:
             self.write('<div style="font-family: verdana;">Wrong link</div>')
  
 #displays Series
 class Series(MovieHandler):
     def get(self):
-        q = models.Series.gql("")
-        p = list(q)
-        if not p:
-            p=[]
-        self.render("series.html", series = p, page_heading = "Series - Marius", listing_length = len(p))
+        series_cursor = models.Series.gql("")
+        series_list = list(series_cursor)
+        if not series_list:
+            series_list=[]
+        self.render("series.html", series = series_list, page_heading = "Series - Marius", listing_length = len(series_list))
         
     def post(self):
         Title_entered = str(self.request.get("Title"))
         ReleaseDate = str(self.request.get("ReleaseDate"))
+        
         if ReleaseDate:
-            logging.error("REleasedate incoming")
+           
             try:
                 ReleaseDate = datetime.datetime.strptime(ReleaseDate, "%d %b %Y").date()
                 if not NewSeries(Title = Title_entered, ReleaseDate = ReleaseDate):
