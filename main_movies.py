@@ -151,7 +151,7 @@ class HomePage(MovieHandler):
         for listing in p:
             
             if listing.FoundTorrent == 0:  
-                update_torrent(listing.key().id())
+                self.update_torrent(listing.key().id())
                 time.sleep(2)
 
         last_check_cursor = System_tools.gql("Where name= :title", title="Updatekeep")
