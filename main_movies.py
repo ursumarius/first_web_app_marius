@@ -291,7 +291,7 @@ class HomePage(MovieHandler):
         self.write("Done")
         
         
-#dialog for adding movies
+#dialog for adding movies using imdb link
 class AddMovie(MovieHandler):
     def get(self, IMDB_link):
         
@@ -332,7 +332,7 @@ class AddMovie(MovieHandler):
         else:
             self.render("AddMovie.html", page_heading = "Add Movie - Marius", error_IMDB_link = "Invalid ID")
             
-            
+#used when input is in JSON
 class AddMovie_json(MovieHandler):
     def get(self):
         self.render("AddMovie_json.html", page_heading = "Add Movies JSON - Marius",)
@@ -365,16 +365,19 @@ class AddMovie_json(MovieHandler):
                 if Poster_link == "None":
                     Poster_link = None
             
-    #do validation according to API, save details in DB
-        
+                #do validation according to API, save details in DB
                 if not NewListing(Title = Title, IMDB_link = IMDB_link, Followed = int(Followed),
                                   Poster_link = Poster_link, Creators = Creators,
                                   Actors = Actors, FoundTorrent = int(FoundTorrent), TorrentLink1 = TorrentLink1,
                                   Last_found_check = Last_found_check, ReleaseDate = ReleaseDate):
                     Errors.append(IMDB_link)
                 Movienr+=1
-        self.write("These were not entered (may be already there/ bad data parsing) = " + str(Errors))
                 
+        #respond with relevant info
+        if Errors:
+            self.write("These were not entered (may be already there/ bad data parsing) = " + str(Errors))
+        else:
+            self.write("Success")
             
             
 class RemoveMovie(MovieHandler):
