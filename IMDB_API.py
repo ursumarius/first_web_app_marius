@@ -3,6 +3,9 @@ import os
 import webapp2
 import string
 import json
+import utilities_mu
+
+escape_urlobj = utilities_mu.escape_urlobj
 
 #prepare query url for IMDB API
 def create_details_url(imdb_id, title= None, year=None):

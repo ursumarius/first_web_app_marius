@@ -72,8 +72,8 @@ def inspect_tpb(title, year, proxies, diff_proxy = None):
             
             if not (re.search( r'TS', title_found, re.M)
                     or re.search( r'trailer', title_found, re.M|re.I)
-                    or re.search( r' cam ', title_found, re.M|re.I)
-                    or re.search( r' camrip ', title_found, re.M|re.I)):
+                    or re.search( r'cam', title_found, re.M|re.I)
+                    or re.search( r'camrip', title_found, re.M|re.I)):
                 
                 if hit == 1 and find_match(title_found, title, year):
                     return search_url
